@@ -1,6 +1,8 @@
 pre-commit:
   parallel: true
   commands:
+    tests:
+      run: just test
     markdownlint:
       tags: documentation style
       glob: "*.md"
