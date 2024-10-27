@@ -1,5 +1,15 @@
 <!-- markdownlint-disable MD013 MD033 MD041 -->
 
+<div align="center">
+  <p>
+    <img src="assets/coop-name.png" align="center" alt="Coop Logo"
+         width="400" />
+  </p>
+  <p>
+    Straightforward Neovim asynchronicity with native Lua coroutines.
+  </p>
+</div>
+
 Coop is a Neovim plugin that provides an asynchronous **op**eration framework
 based on native Lua **co**routines.
 
@@ -22,6 +32,9 @@ Install the plugin with your preferred package manager, such as [Lazy]:
 ## ✅ Comparison to similar tools
 
 ## 🙏 Acknowledgments
+
+The SVG from the logo comes from
+[Uxwing](https://uxwing.com/handshake-color-icon/).
 
 ## 🔗 See also
 
