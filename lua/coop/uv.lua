@@ -2,10 +2,10 @@
 local M = {}
 
 local coop = require("coop")
+local functional_utils = require("coop.functional-utils")
+local shift_cb = functional_utils.shift_parameters
 
-local timer_start = coop.cb_to_co(function(cb, timer, timeout, repeat_)
-	vim.uv.timer_start(timer, timeout, repeat_, cb)
-end)
+local timer_start = coop.cb_to_co(shift_cb(vim.uv.timer_start))
 
 --- Sleeps for a number of milliseconds.
 ---
