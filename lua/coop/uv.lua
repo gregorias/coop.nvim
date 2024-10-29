@@ -10,6 +10,8 @@ local timer_start = coop.cb_to_co(shift_cb(vim.uv.timer_start))
 --- Sleeps for a number of milliseconds.
 ---
 --- This is a fire-and-forget coroutine function.
+---
+---@param ms number The number of milliseconds to sleep.
 M.sleep = function(ms)
 	local timer = vim.uv.new_timer()
 	timer_start(timer, ms, 0)
