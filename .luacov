@@ -1,0 +1,11 @@
+return {
+  include = {
+    "lua/coop$",
+    "lua/coop/uv$",
+  },
+  modules = {
+    ["coop"] = "lua/coop.lua",
+    ["coop.uv"] = "lua/coop/uv.lua",
+  },
+  reporter = "html",
+}
