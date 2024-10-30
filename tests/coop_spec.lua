@@ -10,14 +10,14 @@ local coop = require("coop")
 ---@treturn function The cb function.
 ---@treturn function The resume function.
 local create_blocked_cb_function = function(f)
-	local notification = coop.Notification.new()
+	local future = coop.Future.new()
 
 	local f_resume = function()
-		notification:notify()
+		future:complete()
 	end
 
 	local cb_function = function(cb, ...)
-		notification:wait()
+		future:wait()
 		cb(f(...))
 	end
 

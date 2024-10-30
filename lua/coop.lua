@@ -124,35 +124,4 @@ M.fire_and_forget = function(...)
 	M.spawn(...)
 end
 
---- Notification is a synchronization mechanism that unlocks threads once a work has been completed.
-M.Notification = {}
-
-local meta_notification = {
-	__index = M.Notification,
-}
-
-M.Notification.new = function()
-	return setmetatable({ done = false, queue = {} }, meta_notification)
-end
-
---- Notifies all waiting threads.
-M.Notification.notify = function(self)
-	if not self.done then
-		self.done = true
-		for _, co in ipairs(self.queue) do
-			coroutine.resume(co)
-		end
-	end
-end
-
---- Waits for the notification to be triggered.
----
---- This is a coroutine function that yields until the notification is triggered.
-M.Notification.wait = function(self)
-	if not self.done then
-		table.insert(self.queue, coroutine.running())
-		coroutine.yield()
-	end
-end
-
 return M
