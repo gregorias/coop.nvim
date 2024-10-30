@@ -139,4 +139,34 @@ M.fire_and_forget = function(...)
 	M.spawn(...)
 end
 
+--- Awaits all futures in a list.
+---
+--- This is a coroutine function.
+---
+---@param futures table A list of futures to await.
+---@return table results The results of the futures.
+M.await_all = function(futures)
+	local done_count = 0
+	local this = coroutine.running()
+	local results = {}
+	for _ = 1, #futures do
+		table.insert(results, nil)
+	end
+
+	for i, f in ipairs(futures) do
+		f:wait(function(...)
+			results[i] = { ... }
+			done_count = done_count + 1
+			if done_count == #futures and coroutine.status(this) == "suspended" then
+				coroutine.resume(this)
+			end
+		end)
+	end
+
+	if done_count < #futures then
+		coroutine.yield()
+	end
+	return results
+end
+
 return M

@@ -169,4 +169,32 @@ describe("coop", function()
 			assert.are.same({ 1, 2 }, { f_ret_0, f_ret_1 })
 		end)
 	end)
+
+	describe("await_all", function()
+		it("works with immediately finished futures", function()
+			local future = coop.Future.new()
+			future:complete("foo")
+
+			local results = nil
+			coop.spawn(function()
+				results = coop.await_all({ future })
+			end)
+
+			assert.are.same({ { "foo" } }, results)
+		end)
+
+		it("works with delayed futures", function()
+			local future_1, future_2 = coop.Future.new(), coop.Future.new()
+
+			local results = nil
+			coop.spawn(function()
+				results = coop.await_all({ future_1, future_2 })
+			end)
+
+			future_1:complete("foo")
+			future_2:complete("bar")
+
+			assert.are.same({ { "foo" } , { "bar" } }, results)
+		end)
+	end)
 end)
