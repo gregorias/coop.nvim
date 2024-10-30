@@ -137,5 +137,36 @@ describe("coop", function()
 
 			assert.are.same({ 1, 2 }, { f_ret_0, f_ret_1 })
 		end)
+
+		it("the returned future can wait with a callbacks", function()
+			local f, f_resume = create_blocked_coroutine_function(function()
+				return 1, 2
+			end)
+
+			local f_future = coop.spawn(f)
+			local f_ret_0 = nil
+			local f_ret_1 = nil
+
+			f_future:wait(function(a, b)
+				f_ret_0, f_ret_1 = a, b
+			end)
+
+			f_resume()
+
+			assert.are.same({ 1, 2 }, { f_ret_0, f_ret_1 })
+		end)
+	end)
+
+	describe("Future", function()
+		it("completed future’s wait calls the callback immediately", function()
+			local future = coop.Future.new()
+			future:complete(1, 2)
+
+			local f_ret_0, f_ret_1 = nil, nil
+			future:wait(function(...)
+				f_ret_0, f_ret_1 = ...
+			end)
+			assert.are.same({ 1, 2 }, { f_ret_0, f_ret_1 })
+		end)
 	end)
 end)

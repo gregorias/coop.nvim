@@ -53,7 +53,7 @@ end
 ---@class Future
 ---@field done boolean Whether the future is done.
 ---@field results table The results of the coroutine function.
----@field queue table The queue of coroutines waiting for the future to be done.
+---@field queue table The queue of callbacks to be called once the future is done.
 ---@field complete function A function that marks the future as done with the specified results and resumes coroutines
 ---                         in the waiting queue.
 ---@field wait function A function that waits for the future to be done.
@@ -64,9 +64,7 @@ M.Future.new = function()
 	local future = { done = false, queue = {} }
 	local meta_future = {
 		__index = M.Future,
-		__call = function(...)
-			return future:wait(...)
-		end,
+		__call = M.Future.wait,
 	}
 	return setmetatable(future, meta_future)
 end
@@ -81,22 +79,39 @@ M.Future.complete = function(self, ...)
 
 	self.results = pack(...)
 	self.done = true
-	for _, co in ipairs(self.queue) do
-		coroutine.resume(co, ...)
+	for _, cb in ipairs(self.queue) do
+		cb(...)
 	end
 	self.queue = {}
 end
 
 --- Waits for the future to be done.
 ---
---- This is a coroutine function that yields until the future is done.
+--- If no callback is provided, this is a coroutine function that yields until the future is done.
 ---
----@return any results The results of the coroutine function.
-M.Future.wait = function(self)
+--- If a callback is provided, this calls the callback with the results of the coroutine function when the future is
+--- done.
+---
+---@param cb? function The callback to call with the results of the coroutine function.
+---@return any results The results of the coroutine function if no callback is provided. Otherwise, nothing.
+M.Future.wait = function(self, cb)
+	if cb then
+		if self.done then
+			cb(unpack(self.results))
+			return
+		else
+			table.insert(self.queue, cb)
+			return
+		end
+	end
+
 	if self.done then
 		return unpack(self.results)
 	else
-		table.insert(self.queue, coroutine.running())
+		local this = coroutine.running()
+		table.insert(self.queue, function(...)
+			coroutine.resume(this, ...)
+		end)
 		return coroutine.yield()
 	end
 end
