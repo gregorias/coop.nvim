@@ -56,7 +56,7 @@ end
 ---@field queue table The queue of callbacks to be called once the future is done.
 ---@field complete function A function that marks the future as done with the specified results and resumes coroutines
 ---                         in the waiting queue.
----@field wait function A function that waits for the future to be done.
+---@field await function A function that asynchronously waits for the future to be done.
 M.Future = {}
 
 --- Creates a new future.
