@@ -64,7 +64,7 @@ M.Future.new = function()
 	local future = { done = false, queue = {} }
 	local meta_future = {
 		__index = M.Future,
-		__call = M.Future.wait,
+		__call = M.Future.await,
 	}
 	return setmetatable(future, meta_future)
 end
@@ -94,7 +94,7 @@ end
 ---
 ---@param cb? function The callback to call with the results of the coroutine function.
 ---@return any results The results of the coroutine function if no callback is provided. Otherwise, nothing.
-M.Future.wait = function(self, cb)
+M.Future.await = function(self, cb)
 	if cb then
 		if self.done then
 			cb(unpack(self.results))
@@ -154,7 +154,7 @@ M.await_all = function(futures)
 	end
 
 	for i, f in ipairs(futures) do
-		f:wait(function(...)
+		f:await(function(...)
 			results[i] = { ... }
 			done_count = done_count + 1
 			if done_count == #futures and coroutine.status(this) == "suspended" then

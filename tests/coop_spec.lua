@@ -17,7 +17,7 @@ local create_blocked_cb_function = function(f)
 	end
 
 	local cb_function = function(cb, ...)
-		future:wait()
+		future:await()
 		cb(f(...))
 	end
 
@@ -52,7 +52,7 @@ describe("coop", function()
 			local f = function(cb, a, b)
 				cb(a + b)
 			end
-			local f_co_ret = coop.spawn(coop.cb_to_co(f), 1, 2):wait()
+			local f_co_ret = coop.spawn(coop.cb_to_co(f), 1, 2):await()
 			assert.are.same(3, f_co_ret)
 		end)
 
@@ -61,7 +61,7 @@ describe("coop", function()
 				cb(a + b, a * b)
 			end
 
-			local f_co_ret_sum, f_co_ret_mul = coop.spawn(coop.cb_to_co(f), 1, 2):wait()
+			local f_co_ret_sum, f_co_ret_mul = coop.spawn(coop.cb_to_co(f), 1, 2):await()
 
 			assert.are.same(3, f_co_ret_sum)
 			assert.are.same(2, f_co_ret_mul)
@@ -147,7 +147,7 @@ describe("coop", function()
 			local f_ret_0 = nil
 			local f_ret_1 = nil
 
-			f_future:wait(function(a, b)
+			f_future:await(function(a, b)
 				f_ret_0, f_ret_1 = a, b
 			end)
 
@@ -163,7 +163,7 @@ describe("coop", function()
 			future:complete(1, 2)
 
 			local f_ret_0, f_ret_1 = nil, nil
-			future:wait(function(...)
+			future:await(function(...)
 				f_ret_0, f_ret_1 = ...
 			end)
 			assert.are.same({ 1, 2 }, { f_ret_0, f_ret_1 })
