@@ -13,12 +13,12 @@ describe("coop.uv", function()
 			end)
 
 			-- The timer should not be done yet and should execute asynchronously.
-			assert.is_false(done)
+			assert.is.False(done)
 
 			vim.wait(100, function()
 				return done
 			end, 20)
-			assert.is_true(done)
+			assert.is.True(done)
 		end)
 	end)
 end)
