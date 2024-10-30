@@ -46,13 +46,75 @@ M.cb_to_co = function(f)
 	return f_co
 end
 
+--- A future is a synchronization mechanism that allows waiting for a coroutine to return.
+---
+--- Futures turn spawn coroutine functions back into coroutine functions as they implement the call operator.
+---
+---@class Future
+---@field done boolean Whether the future is done.
+---@field results table The results of the coroutine function.
+---@field queue table The queue of coroutines waiting for the future to be done.
+---@field complete function A function that marks the future as done with the specified results and resumes coroutines
+---                         in the waiting queue.
+---@field wait function A function that waits for the future to be done.
+M.Future = {}
+
+--- Creates a new future.
+M.Future.new = function()
+	local future = { done = false, queue = {} }
+	local meta_future = {
+		__index = M.Future,
+		__call = function(...)
+			return future:wait(...)
+		end,
+	}
+	return setmetatable(future, meta_future)
+end
+
+--- Marks the future as done with the specified results and resumes coroutines in the waiting queue.
+---
+---@param ... any The results of the coroutine function.
+M.Future.complete = function(self, ...)
+	if self.done then
+		error("Tried to complete an already done future.")
+	end
+
+	self.results = pack(...)
+	self.done = true
+	for _, co in ipairs(self.queue) do
+		coroutine.resume(co, ...)
+	end
+	self.queue = {}
+end
+
+--- Waits for the future to be done.
+---
+--- This is a coroutine function that yields until the future is done.
+---
+---@return any results The results of the coroutine function.
+M.Future.wait = function(self)
+	if self.done then
+		return unpack(self.results)
+	else
+		table.insert(self.queue, coroutine.running())
+		return coroutine.yield()
+	end
+end
+
 --- Spawns a coroutine function in a thread.
 ---
----@tparam function f_co The coroutine function to spawn.
----@treturn any The result of the coroutine function until the first yield.
+--- The returned future can turn the coroutine back into a coroutine function.
+--- spawn(f_co, ...)() is semantically the same as f_co(...)
+---
+---@param f_co function The coroutine function to spawn.
+---@return Future future The future for the coroutine.
 M.spawn = function(f_co, ...)
-	local result = pack(coroutine.resume(coroutine.create(f_co), ...))
-	return unpack(result, 2, result.n)
+	local future = M.Future.new()
+	local args = { ... }
+	coroutine.resume(coroutine.create(function()
+		future:complete(f_co(unpack(args)))
+	end))
+	return future
 end
 
 --- Spawns and forgets a coroutine function.

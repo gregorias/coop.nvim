@@ -24,13 +24,35 @@ local create_blocked_cb_function = function(f)
 	return cb_function, f_resume
 end
 
+local create_blocked_coroutine_function = function(f)
+	local pass = false
+	local thread = nil
+
+	local coroutine_function = function(...)
+		thread = coroutine.running()
+		if not pass then
+			coroutine.yield()
+		end
+		return f(...)
+	end
+
+	local f_resume = function()
+		pass = true
+		if thread then
+			coroutine.resume(thread)
+		end
+	end
+
+	return coroutine_function, f_resume
+end
+
 describe("coop", function()
 	describe("cb_to_co", function()
 		it("converts an immediate callback-based function to a coroutine function", function()
 			local f = function(cb, a, b)
 				cb(a + b)
 			end
-			local f_co_ret = coop.spawn(coop.cb_to_co(f), 1, 2)
+			local f_co_ret = coop.spawn(coop.cb_to_co(f), 1, 2):wait()
 			assert.are.same(3, f_co_ret)
 		end)
 
@@ -39,7 +61,7 @@ describe("coop", function()
 				cb(a + b, a * b)
 			end
 
-			local f_co_ret_sum, f_co_ret_mul = coop.spawn(coop.cb_to_co(f), 1, 2)
+			local f_co_ret_sum, f_co_ret_mul = coop.spawn(coop.cb_to_co(f), 1, 2):wait()
 
 			assert.are.same(3, f_co_ret_sum)
 			assert.are.same(2, f_co_ret_mul)
@@ -95,6 +117,25 @@ describe("coop", function()
 			f_resume()
 
 			assert.are.same({ "foo", nil, "bar", nil }, results)
+		end)
+	end)
+
+	describe("spawn", function()
+		it("returns an awaitable future", function()
+			local f, f_resume = create_blocked_coroutine_function(function()
+				return 1, 2
+			end)
+
+			local f_future = coop.spawn(f)
+			local f_ret_0 = nil
+			local f_ret_1 = nil
+			coop.spawn(function()
+				f_ret_0, f_ret_1 = f_future()
+			end)
+
+			f_resume()
+
+			assert.are.same({ 1, 2 }, { f_ret_0, f_ret_1 })
 		end)
 	end)
 end)
