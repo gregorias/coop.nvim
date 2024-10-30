@@ -11,9 +11,9 @@ end
 --- If the callback is called asynchronously, then the coroutine function yield exactly once and is resumed by whoever
 --- calls the callback. If the callback is called synchronously, then the coroutine function returns immediately.
 ---
----@tparam  function f The function to convert. The callback needs to be its first argument.
----@treturn function A coroutine function. Accepts the same arguments as f without the callback.
----                  Returns what f has passed to the callback.
+---@param  f function The function to convert. The callback needs to be its first argument.
+---@return function co A coroutine function. Accepts the same arguments as f without the callback.
+---                    Returns what f has passed to the callback.
 M.cb_to_co = function(f)
 	local f_co = function(...)
 		local this = coroutine.running()
