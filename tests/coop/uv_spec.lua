@@ -7,7 +7,7 @@ describe("coop.uv", function()
 		it("sleeps for some time in an asynchronous coroutine", function()
 			local done = false
 
-			coop.spawn(function()
+			local future = coop.spawn(function()
 				uv.sleep(50)
 				done = true
 			end)
@@ -15,9 +15,7 @@ describe("coop.uv", function()
 			-- The timer should not be done yet and should execute asynchronously.
 			assert.is.False(done)
 
-			vim.wait(100, function()
-				return done
-			end, 20)
+			future:wait(100, 20)
 			assert.is.True(done)
 		end)
 	end)

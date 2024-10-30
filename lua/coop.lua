@@ -85,7 +85,7 @@ M.Future.complete = function(self, ...)
 	self.queue = {}
 end
 
---- Waits for the future to be done.
+--- asynchronously waits for the future to be done.
 ---
 --- If no callback is provided, this is a coroutine function that yields until the future is done.
 ---
@@ -113,6 +113,24 @@ M.Future.await = function(self, cb)
 			coroutine.resume(this, ...)
 		end)
 		return coroutine.yield()
+	end
+end
+
+--- Synchronously wait for the future to be done.
+---
+--- This function uses busy waiting to wait for the future to be done.
+---
+---@param timeout number The timeout in milliseconds.
+---@param interval number The interval in milliseconds between checks.
+---@return any results The results of the coroutine function if done. Otherwise, nothing.
+M.Future.wait = function(self, timeout, interval)
+	vim.wait(timeout, function()
+		return self.done
+	end, interval)
+	if self.done then
+		return unpack(self.results)
+	else
+		return
 	end
 end
 
