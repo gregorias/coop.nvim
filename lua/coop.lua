@@ -52,10 +52,12 @@ end
 ---
 ---@class Future
 ---@field done boolean Whether the future is done.
----@field results table The results of the coroutine function.
+---@field results table The results of the coroutine function in pcall/coroutine.resume format.
 ---@field queue table The queue of callbacks to be called once the future is done.
----@field complete function A function that marks the future as done with the specified results and resumes coroutines
+---@field complete function A function that marks the future as done with the specified results and calls the callbacks
 ---                         in the waiting queue.
+---@field set_error function A function that marks the future as finished with an error and calls the callbacks
+---                          in the waiting queue.
 ---@field await function Asynchronously waits for the future to be done.
 ---@field await_cb function Asynchronously waits for the future to be done.
 M.Future = {}
@@ -79,12 +81,29 @@ M.Future.complete = function(self, ...)
 	end
 
 	self.results = pack(...)
+	table.insert(self.results, 1, true)
 	self.done = true
 	for _, cb in ipairs(self.queue) do
-		cb(...)
+		cb(unpack(self.results))
 	end
 	self.queue = {}
 end
+
+M.Future.set_error = function(self, err)
+	if self.done then
+		error("Tried to set an error on an already done future.")
+	end
+
+	self.results = { false, err }
+	self.done = true
+	for _, cb in ipairs(self.queue) do
+		cb(unpack(self.results))
+	end
+	self.queue = {}
+end
+
+-- Future.await returns the results like `coroutine.resume`. It can’t just rethrow, because `pcall` doesn’t work with
+-- coroutine functions (we can’t yield over pcalls).
 
 --- Asynchronously waits for the future to be done.
 ---
@@ -109,7 +128,7 @@ end
 ---
 --- This calls the callback with the results of the coroutine function when the future is done.
 ---
----@param cb function The callback to call with the results of the coroutine function.
+---@param cb function The callback to call with the results of the coroutine.
 M.Future.await_cb = function(self, cb)
 	if self.done then
 		cb(unpack(self.results))

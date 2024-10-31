@@ -52,7 +52,8 @@ describe("coop", function()
 			local f = function(cb, a, b)
 				cb(a + b)
 			end
-			local f_co_ret = coop.spawn(coop.cb_to_co(f), 1, 2):await()
+			local success, f_co_ret = coop.spawn(coop.cb_to_co(f), 1, 2):await()
+			assert.is.True(success)
 			assert.are.same(3, f_co_ret)
 		end)
 
@@ -61,8 +62,9 @@ describe("coop", function()
 				cb(a + b, a * b)
 			end
 
-			local f_co_ret_sum, f_co_ret_mul = coop.spawn(coop.cb_to_co(f), 1, 2):await()
+			local success, f_co_ret_sum, f_co_ret_mul = coop.spawn(coop.cb_to_co(f), 1, 2):await()
 
+			assert.is.True(success)
 			assert.are.same(3, f_co_ret_sum)
 			assert.are.same(2, f_co_ret_mul)
 		end)
@@ -127,14 +129,14 @@ describe("coop", function()
 			end)
 
 			local f_future = coop.spawn(f)
-			local f_ret_0 = nil
-			local f_ret_1 = nil
+			local success, f_ret_0, f_ret_1 = false, nil, nil
 			coop.spawn(function()
-				f_ret_0, f_ret_1 = f_future()
+				success, f_ret_0, f_ret_1 = f_future()
 			end)
 
 			f_resume()
 
+			assert.is.True(success)
 			assert.are.same({ 1, 2 }, { f_ret_0, f_ret_1 })
 		end)
 
@@ -144,15 +146,17 @@ describe("coop", function()
 			end)
 
 			local f_future = coop.spawn(f)
+			local success = false
 			local f_ret_0 = nil
 			local f_ret_1 = nil
 
-			f_future:await_cb(function(a, b)
-				f_ret_0, f_ret_1 = a, b
+			f_future:await_cb(function(success_, a, b)
+				success, f_ret_0, f_ret_1 = success_, a, b
 			end)
 
 			f_resume()
 
+			assert.is.True(success)
 			assert.are.same({ 1, 2 }, { f_ret_0, f_ret_1 })
 		end)
 	end)
@@ -162,11 +166,27 @@ describe("coop", function()
 			local future = coop.Future.new()
 			future:complete(1, 2)
 
-			local f_ret_0, f_ret_1 = nil, nil
+			local success, f_ret_0, f_ret_1 = false, nil, nil
 			future:await_cb(function(...)
-				f_ret_0, f_ret_1 = ...
+				success, f_ret_0, f_ret_1 = ...
 			end)
+			assert.is.True(success)
 			assert.are.same({ 1, 2 }, { f_ret_0, f_ret_1 })
+		end)
+
+		describe("await", function()
+			it("returns errors like pcall for asynchronously error-ended futures", function()
+				local future = coop.Future.new()
+
+				local success, err = true, ""
+				coop.spawn(function()
+					success, err = future:await()
+				end)
+
+				future:set_error("foo")
+				assert.is.False(success)
+				assert.are.same("foo", err)
+			end)
 		end)
 	end)
 
@@ -180,7 +200,7 @@ describe("coop", function()
 				results = coop.await_all({ future })
 			end)
 
-			assert.are.same({ { "foo" } }, results)
+			assert.are.same({ { true, "foo" } }, results)
 		end)
 
 		it("works with delayed futures", function()
@@ -194,7 +214,7 @@ describe("coop", function()
 			future_1:complete("foo")
 			future_2:complete("bar")
 
-			assert.are.same({ { "foo" }, { "bar" } }, results)
+			assert.are.same({ { true, "foo" }, { true, "bar" } }, results)
 		end)
 	end)
 end)
