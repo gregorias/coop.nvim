@@ -56,7 +56,8 @@ end
 ---@field queue table The queue of callbacks to be called once the future is done.
 ---@field complete function A function that marks the future as done with the specified results and resumes coroutines
 ---                         in the waiting queue.
----@field await function A function that asynchronously waits for the future to be done.
+---@field await function Asynchronously waits for the future to be done.
+---@field await_cb function Asynchronously waits for the future to be done.
 M.Future = {}
 
 --- Creates a new future.
@@ -85,26 +86,12 @@ M.Future.complete = function(self, ...)
 	self.queue = {}
 end
 
---- asynchronously waits for the future to be done.
+--- Asynchronously waits for the future to be done.
 ---
---- If no callback is provided, this is a coroutine function that yields until the future is done.
+--- This is a coroutine function that yields until the future is done.
 ---
---- If a callback is provided, this calls the callback with the results of the coroutine function when the future is
---- done.
----
----@param cb? function The callback to call with the results of the coroutine function.
----@return any results The results of the coroutine function if no callback is provided. Otherwise, nothing.
-M.Future.await = function(self, cb)
-	if cb then
-		if self.done then
-			cb(unpack(self.results))
-			return
-		else
-			table.insert(self.queue, cb)
-			return
-		end
-	end
-
+---@return any results The results of the coroutine function
+M.Future.await = function(self)
 	if self.done then
 		return unpack(self.results)
 	else
@@ -113,6 +100,23 @@ M.Future.await = function(self, cb)
 			coroutine.resume(this, ...)
 		end)
 		return coroutine.yield()
+	end
+end
+
+-- Use a different name for the callback version, so that we can use good types.
+
+--- Asynchronously waits for the future to be done.
+---
+--- This calls the callback with the results of the coroutine function when the future is done.
+---
+---@param cb function The callback to call with the results of the coroutine function.
+M.Future.await_cb = function(self, cb)
+	if self.done then
+		cb(unpack(self.results))
+		return
+	else
+		table.insert(self.queue, cb)
+		return
 	end
 end
 
@@ -172,7 +176,7 @@ M.await_all = function(futures)
 	end
 
 	for i, f in ipairs(futures) do
-		f:await(function(...)
+		f:await_cb(function(...)
 			results[i] = { ... }
 			done_count = done_count + 1
 			if done_count == #futures and coroutine.status(this) == "suspended" then

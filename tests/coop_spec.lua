@@ -147,7 +147,7 @@ describe("coop", function()
 			local f_ret_0 = nil
 			local f_ret_1 = nil
 
-			f_future:await(function(a, b)
+			f_future:await_cb(function(a, b)
 				f_ret_0, f_ret_1 = a, b
 			end)
 
@@ -163,7 +163,7 @@ describe("coop", function()
 			future:complete(1, 2)
 
 			local f_ret_0, f_ret_1 = nil, nil
-			future:await(function(...)
+			future:await_cb(function(...)
 				f_ret_0, f_ret_1 = ...
 			end)
 			assert.are.same({ 1, 2 }, { f_ret_0, f_ret_1 })
@@ -194,7 +194,7 @@ describe("coop", function()
 			future_1:complete("foo")
 			future_2:complete("bar")
 
-			assert.are.same({ { "foo" } , { "bar" } }, results)
+			assert.are.same({ { "foo" }, { "bar" } }, results)
 		end)
 	end)
 end)
