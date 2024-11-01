@@ -109,6 +109,8 @@ end
 ---
 --- This function uses busy waiting to wait for the future to be done.
 ---
+--- This function throws an error if the future ended with an error.
+---
 ---@param timeout number The timeout in milliseconds.
 ---@param interval number The interval in milliseconds between checks.
 ---@return any results The results of the coroutine function if done. Otherwise, nothing.
@@ -117,7 +119,11 @@ M.Future.wait = function(self, timeout, interval)
 		return self.done
 	end, interval)
 	if self.done then
-		return unpack(self.results)
+		if self.results[1] then
+			return unpack(self.results, 2, #self.results)
+		else
+			error(self.results[2])
+		end
 	else
 		return
 	end
