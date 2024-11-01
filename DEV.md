@@ -16,6 +16,16 @@ Install lefthook:
 lefthook install
 ```
 
+## Glossary
+
+A **coroutine function** is a Lua function, which may call `coroutine.yield`.
+A coroutine function must always be executed within a **coroutine**.
+
+A **plain coroutine function** is a coroutine function that doesn’t implement
+any protocol for its yields.
+A plain coroutine function doesn’t return any values in yields nor expect any
+values from them.
+
 ## ADRs
 
 ### On using tasks (coroutine + future)
