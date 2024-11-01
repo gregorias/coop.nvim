@@ -1,7 +1,7 @@
 --- Busted tests for coop.table-utils.
 local coop = require("coop")
 
-describe("coop.table-utils", function()
+describe("coop.future", function()
 	describe("Future", function()
 		it("completed future’s wait calls the callback immediately", function()
 			local future = coop.Future.new()

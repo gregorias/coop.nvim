@@ -76,11 +76,15 @@ M.Future.await = function(self)
 	if self.done then
 		return unpack(self.results)
 	else
-		local this = coroutine.running()
+		local task = require("coop.task")
+		local this = task.running()
+		if this == nil then
+			error("Future.await can only be used in a task.")
+		end
 		table.insert(self.queue, function(...)
-			coroutine.resume(this, ...)
+			task.resume(this, ...)
 		end)
-		return coroutine.yield()
+		return task.yield()
 	end
 end
 

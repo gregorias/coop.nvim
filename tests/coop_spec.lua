@@ -1,5 +1,6 @@
 --- Busted tests for coop.
 local coop = require("coop")
+local task = require("coop.task")
 
 --- Creates a cb function that blocks until a resume function is called.
 ---
@@ -29,9 +30,9 @@ local create_blocked_coroutine_function = function(f)
 	local thread = nil
 
 	local coroutine_function = function(...)
-		thread = coroutine.running()
+		thread = task.running()
 		if not pass then
-			coroutine.yield()
+			task.yield()
 		end
 		return f(...)
 	end
@@ -39,7 +40,7 @@ local create_blocked_coroutine_function = function(f)
 	local f_resume = function()
 		pass = true
 		if thread then
-			coroutine.resume(thread)
+			task.resume(thread)
 		end
 	end
 
@@ -158,6 +159,25 @@ describe("coop", function()
 
 			assert.is.True(success)
 			assert.are.same({ 1, 2 }, { f_ret_0, f_ret_1 })
+		end)
+
+		it("spawned tasks capture errors", function()
+			local f, f_resume = create_blocked_coroutine_function(function()
+				error("foo", 0)
+			end)
+
+			local f_future = coop.spawn(f)
+			local success = true
+			local f_err = ""
+
+			f_future:await_cb(function(success_, err)
+				success, f_err = success_, err
+			end)
+
+			f_resume()
+
+			assert.is.False(success)
+			assert.are.same("foo", f_err)
 		end)
 	end)
 
