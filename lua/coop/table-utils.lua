@@ -1,6 +1,15 @@
 --- Table utilities.
 local M = {}
 
+--- Packs a vararg expression into a table.
+---
+---@param ... ...
+---@return table
+M.pack = function(...)
+	-- selene: allow(mixed_table)
+	return { n = select("#", ...), ... }
+end
+
 --- Shifts elements of a list to the left.
 ---
 ---@param t table The list to shift.
