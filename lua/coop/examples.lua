@@ -13,18 +13,20 @@ local uv = require("coop.uv")
 ---@return number[] sorted_values the sorted values
 M.sort_with_time = function(values)
 	local futures = {}
-	local results = {}
+	local sorted_results = {}
+
+	-- For each number, create a task that sleeps for that number of milliseconds.
 	for _, value in ipairs(values) do
-		table.insert(
-			futures,
-			coop.spawn(function()
-				uv.sleep(value)
-				table.insert(results, value)
-			end)
-		)
+		local future = coop.spawn(function()
+			uv.sleep(value)
+			table.insert(sorted_results, value)
+		end)
+		table.insert(futures, future)
 	end
+
 	coop.await_all(futures)
-	return results
+
+	return sorted_results
 end
 
 return M
