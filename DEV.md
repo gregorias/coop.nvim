@@ -16,7 +16,7 @@ Install lefthook:
 lefthook install
 ```
 
-## ARDs
+## ADRs
 
 ### Using `coroutine.resume` return format in coroutine functions
 
