@@ -7,7 +7,7 @@ describe("coop.uv", function()
 		it("sleeps for some time in an asynchronous coroutine", function()
 			local done = false
 
-			local future = coop.spawn(function()
+			local spawned_task = coop.spawn(function()
 				uv.sleep(50)
 				done = true
 			end)
@@ -15,17 +15,17 @@ describe("coop.uv", function()
 			-- The timer should not be done yet and should execute asynchronously.
 			assert.is.False(done)
 
-			future:wait(100, 20)
+			spawned_task:wait(100, 20)
 			assert.is.True(done)
 		end)
 
 		it("works with an vim.api call", function()
-			local future = coop.spawn(function()
+			local spawned_task = coop.spawn(function()
 				uv.sleep(50)
 				return vim.api.nvim_get_current_line()
 			end)
 
-			local result = future:wait(100, 20)
+			local result = spawned_task:wait(100, 20)
 			assert.are.same("", result)
 		end)
 	end)

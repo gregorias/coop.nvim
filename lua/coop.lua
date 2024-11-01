@@ -28,11 +28,7 @@ M.cb_to_co = function(f)
 			if task.status(this) == "suspended" then
 				-- If we are suspended, then f_co has yielded control after calling f.
 				-- Use the caller of this callback to resume computation until the next yield.
-				local cb_ret = pack(task.resume(this))
-				if not cb_ret[1] then
-					error(cb_ret[2])
-				end
-				return unpack(cb_ret, 2, cb_ret.n)
+				task.resume(this)
 			end
 		end, ...)
 		if f_status == "running" then
@@ -52,11 +48,11 @@ end
 --- spawn(f_co, ...)() is semantically the same as f_co(...)
 ---
 ---@param f_co function The coroutine function to spawn.
----@return Future future The future for the coroutine.
+---@return Task task the spawned task
 M.spawn = function(f_co, ...)
 	local spawned_task = task.create(f_co)
 	task.resume(spawned_task, ...)
-	return spawned_task.future
+	return spawned_task
 end
 
 --- Spawns and forgets a coroutine function.
