@@ -15,16 +15,18 @@ based on native Lua **co**routines.
 If you write Lua code in Neovim, Coop lets you write non-blocking code that
 looks synchronous like async/await in other languages.
 
-Coop was designed to be simple by being as close to native Lua coroutines as
-possible while enabling features expected from a structured concurrency
-framework:
+Coop was designed to
 
-- Ability to cancel in-flight tasks or task groups.
-- Ability to wait for tasks to finish and inspect results or errors.
-- Ability to work with any asynchronous function whether it uses callbacks or
-  `coroutine.yield`.
-- Ability to launch and wait for parallelized operations, e.g., launching
-  multiple asynchronous filesystem crawlers.
+- Be simple. [It should be easy to explain.](How it works.md)
+- Stay close to native Lua coroutines and Lua’s idioms. Coop interface feels
+  like a synchronous interface would and minimizes surprizes.
+- Come with batteries included for Neovim.
+
+Here’s what else you can expect from Coop:
+
+- True parallelism with a rich set of control operators.
+- A flexible cancellation mechanism.
+- Extensibility — Turn any callback-based function into a task function.
 
 ## ⚡️ Requirements
 
