@@ -83,9 +83,6 @@ M.Future.await = function(self, cb_or_timeout, interval)
 	end
 end
 
--- Future.await returns the results like `coroutine.resume`. It can’t just rethrow, because `pcall` doesn’t work with
--- coroutine functions (we can’t yield over pcalls).
-
 --- Asynchronously waits for the future to be done.
 ---
 --- This is a task function that yields until the future is done.
@@ -102,10 +99,17 @@ M.Future.await_tf = function(self)
 		if this == nil then
 			error("Future.await can only be used in a task.")
 		end
+
 		table.insert(self.queue, function(...)
 			task.resume(this, ...)
 		end)
-		return task.yield()
+
+		local results = { task.yield() }
+		if results[1] then
+			return unpack(results, 2, #results)
+		else
+			error(results[2], 0)
+		end
 	end
 end
 

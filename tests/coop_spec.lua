@@ -130,14 +130,13 @@ describe("coop", function()
 			end)
 
 			local f_future = coop.spawn(f)
-			local success, f_ret_0, f_ret_1 = false, nil, nil
+			local f_ret_0, f_ret_1 = nil, nil
 			coop.spawn(function()
-				success, f_ret_0, f_ret_1 = f_future()
+				f_ret_0, f_ret_1 = f_future()
 			end)
 
 			f_resume()
 
-			assert.is.True(success)
 			assert.are.same({ 1, 2 }, { f_ret_0, f_ret_1 })
 		end)
 

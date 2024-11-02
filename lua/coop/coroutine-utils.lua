@@ -23,8 +23,8 @@ M.copcall = function(f_co, ...)
 			return true, unpack(results, 2)
 		end
 
-		coroutine.yield()
-		results = { coroutine.resume(thread) }
+		local args = { coroutine.yield() }
+		results = { coroutine.resume(thread, unpack(args)) }
 	end
 end
 

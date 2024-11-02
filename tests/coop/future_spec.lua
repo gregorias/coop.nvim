@@ -1,5 +1,6 @@
 --- Busted tests for coop.table-utils.
 local coop = require("coop")
+local copcall = require("coop.coroutine-utils").copcall
 
 describe("coop.future", function()
 	describe("Future", function()
@@ -21,7 +22,7 @@ describe("coop.future", function()
 
 				local success, err = true, ""
 				coop.spawn(function()
-					success, err = future:await()
+					success, err = copcall(future.await, future)
 				end)
 
 				future:set_error("foo")
