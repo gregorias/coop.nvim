@@ -19,6 +19,7 @@ globals:
   assert.has.error:
     args:
       - type: function
+      - type: string
   assert.are_nil:
     args:
       - type: any

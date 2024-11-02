@@ -1,6 +1,7 @@
 return {
   include = {
     "lua/coop$",
+    "lua/coop/control$",
     "lua/coop/coroutine-utils$",
     "lua/coop/future$",
     "lua/coop/task$",
@@ -8,6 +9,7 @@ return {
   },
   modules = {
     ["coop"] = "lua/coop.lua",
+    ["coop.control"] = "lua/coop/control.lua",
     ["coop.coroutine-utils"] = "lua/coop/coroutine-utils.lua",
     ["coop.future"] = "lua/coop/future.lua",
     ["coop.task"] = "lua/coop/task.lua",
