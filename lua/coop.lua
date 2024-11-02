@@ -6,12 +6,12 @@ local task = require("coop.task")
 M.Future = require("coop.future").Future
 M.cb_to_tf = require("coop.task-utils").cb_to_tf
 
---- Spawns a coroutine function in a thread.
+--- Spawns a task function in a thread.
 ---
---- The returned future can turn the coroutine back into a coroutine function.
+--- The returned task can be turned back into a task function.
 --- spawn(f_co, ...)() is semantically the same as f_co(...)
 ---
----@param f_co function The coroutine function to spawn.
+---@param f_co function The task function to spawn.
 ---@return Task task the spawned task
 M.spawn = function(f_co, ...)
 	local spawned_task = task.create(f_co)
