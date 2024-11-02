@@ -17,7 +17,7 @@ looks synchronous like async/await in other languages.
 
 Coop was designed to
 
-- Be simple. [It should be easy to explain.](/How it works.md)
+- Be simple. [It should be easy to explain.](How%20it%20works.md)
 - Stay close to native Lua coroutines and Lua’s idioms. Coop interface feels
   like a synchronous interface would and minimizes surprizes.
 - Come with batteries included for Neovim.
@@ -96,7 +96,7 @@ Overall, [Nio] seems like a solid asynchronous framework.
 I started Coop before I knew about Nio, and I continued building Coop, because
 I thought I could make a design and implementation that are clearer and more
 principled.
-The litmus test for me was whether I would be able to write [a guide](/How it works.md) into the
+The litmus test for me was whether I would be able to write [a guide](How%20it%20works.md) into the
 internals that is easy to follow for someone that knows coroutines.
 
 In terms of features, Coop has a more powerful cancellation mechanism.
