@@ -17,7 +17,7 @@ looks synchronous like async/await in other languages.
 
 Coop was designed to
 
-- Be simple. [It should be easy to explain.](How it works.md)
+- Be simple. [It should be easy to explain.](./How it works.md)
 - Stay close to native Lua coroutines and Lua’s idioms. Coop interface feels
   like a synchronous interface would and minimizes surprizes.
 - Come with batteries included for Neovim.
