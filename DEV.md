@@ -28,6 +28,12 @@ values from them.
 
 ## ADRs
 
+The project overall had the following design guidelines:
+
+- Extend coroutines without replacing them. Keep things simple by extending how
+  coroutines work and keeping as much of their behaviour as reasonable.
+- Make asynchronous code behave similarly to synchronous code.
+
 ### On using tasks (coroutine + future)
 
 This record is about the decision to implement the `task` interface that
@@ -51,15 +57,28 @@ worth it: the implementation is dead simple in the end.
 In summary, pure coroutines lack the ability to store their results.
 Tasks add that useful capability at a low cost.
 
-### Using `coroutine.resume` return format in coroutine functions
+### On a single await function
 
-Coroutine functions such as `Future.await` first return a success boolean and
-then either an error or return values.
+I decided that a future should expose a single await function that can work in
+three modes:
 
-An alternative would have been to rethrow errors, but this is not workable,
-because `Future.await` is a coroutine function.
-Since yields can’t cross pcalls, clients wouldn’t be able to use pcalls and
-therefore catch those errors.
+- an asynchronous task function
+- a callback-based function
+- busy waiting
+
+All three cases are useful in practice and a single function makes the
+interface more fluent and more elegant.
+I just found that having three different names was clumsy.
+
+### On `Future._call`
+
+I made `await` available under a function call, so that people can use
+awaitables as if they were task functions.
+This is inline with the design goal to avoid asynchronous boilerplate.
+
+### On rethrowing errors in `await`
+
+`await` rethrows errors. This makes `await` behave like a regular function would.
 
 [Commitlint]: https://github.com/conventional-changelog/commitlint
 [Lefthook]: https://github.com/evilmartians/lefthook
