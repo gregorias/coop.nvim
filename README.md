@@ -42,12 +42,29 @@ Install the plugin with your preferred package manager, such as [Lazy]:
 
 ## 🚀 Usage
 
+### Interface Guide
+
+#### Task
+
 ## ✅ Comparison to similar tools
 
-### `nvim-nio`
+### Nio
 
-- TODO: Simpler in principle.
-- TODO: Ability to define cancel hooks.
+Overall, [Nio] seems like a solid asynchronous framework.
+
+I started Coop before I knew about Nio, and I continued building Coop, because
+I thought I could make a design and implementation that are clearer and more
+principled.
+The litmus test for me was whether I would be able to write a guide into the
+internals that is easy to follow for someone that knows coroutines (this is TBD).
+
+In terms of features, Coop has a more powerful cancellation mechanism.
+In Coop, task cancellation causes an error to be thrown in the affected task.
+This allows the programmer to implement any custom cancellation logic, e.g., cancelling child tasks or unloading resources.
+As far as I can tell, **Nio doesn’t let you safely unload resources upon cancellation** as
+[it just makes the task dead](https://github.com/nvim-neotest/nvim-nio/blob/a428f309119086dc78dd4b19306d2d67be884eee/lua/nio/tasks.lua#L113-L116).
+
+### Plenary Async
 
 ## 🙏 Acknowledgments
 
@@ -60,3 +77,4 @@ The SVG from the logo comes from
 - [Toggle](https://github.com/gregorias/toggle.nvim) — My Neovim plugin for toggling options.
 
 [Lazy]: https://github.com/folke/lazy.nvim
+[Nio]: https://github.com/nvim-neotest/nvim-nio
