@@ -19,13 +19,6 @@ M.spawn = function(f_co, ...)
 	return spawned_task
 end
 
---- Spawns and forgets a coroutine function.
----
----@tparam function f_co The coroutine function to fire and forget.
-M.fire_and_forget = function(...)
-	M.spawn(...)
-end
-
 --- Awaits all futures in a list.
 ---
 --- This is a coroutine function.
