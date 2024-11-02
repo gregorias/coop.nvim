@@ -47,19 +47,22 @@ Install the plugin with your preferred package manager, such as [Lazy]:
 A good introduction to Coop or any framework is to look at code examples.
 Check out [`lua/coop/examples.lua`](/lua/coop/examples.lua):
 
-`search_for_readme` shows a hello world of asynchronicity: filesystem operations.
+[`search_for_readme`](https://github.com/gregorias/coop.nvim/blob/0e2082500707f2a143ff924ad36577c348148517/lua/coop/examples.lua#L40)
+shows a hello world of asynchronicity: filesystem operations.
 Notice that, although `search_for_readme` is non-blocking, it looks _exactly_
 like its synchronous counterpart would look like.
 One tiny caveat is that you need to spawn it in your main, synchronous thread:
 `coop.spawn(search_for_readme)`.
 
-`sort_with_time` shows that Coop achieves true parallelism.
+[`sort_with_time`](https://github.com/gregorias/coop.nvim/blob/0e2082500707f2a143ff924ad36577c348148517/lua/coop/examples.lua#L72)
+shows that Coop achieves true parallelism.
 It launches parallel timers with `coop.spawn` and uses a
 `coop.control.as_completed` to conveniently capture results as each timer
 completes.
 
-`run_parallel_search` is the final example and it shows the flexible
-cancellation mechanism together with error handling.
+[`run_parallel_search`](https://github.com/gregorias/coop.nvim/blob/0e2082500707f2a143ff924ad36577c348148517/lua/coop/examples.lua#L98)
+is the final example and it shows the flexible cancellation mechanism together
+with error handling.
 
 ### Interface guide
 
