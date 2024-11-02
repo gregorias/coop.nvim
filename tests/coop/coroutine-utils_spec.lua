@@ -15,7 +15,7 @@ describe("coop.coroutine-utils", function()
 				return copcall(throw_after_sleep)
 			end
 
-			local success, err_msg = coop.spawn(f_co):wait(5, 1)
+			local success, err_msg = coop.spawn(f_co):await(5, 1)
 
 			assert.is.False(success)
 			assert.are.same("error", err_msg)
@@ -30,7 +30,7 @@ describe("coop.coroutine-utils", function()
 				return copcall(throw_after_sleep)
 			end
 
-			local success, val = coop.spawn(f_co):wait(5, 1)
+			local success, val = coop.spawn(f_co):await(5, 1)
 
 			assert.is.True(success)
 			assert.are.same("foo", val)

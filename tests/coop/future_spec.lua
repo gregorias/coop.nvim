@@ -8,7 +8,7 @@ describe("coop.future", function()
 			future:complete(1, 2)
 
 			local success, f_ret_0, f_ret_1 = false, nil, nil
-			future:await_cb(function(...)
+			future:await(function(...)
 				success, f_ret_0, f_ret_1 = ...
 			end)
 			assert.is.True(success)

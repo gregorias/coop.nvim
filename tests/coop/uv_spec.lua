@@ -15,7 +15,7 @@ describe("coop.uv", function()
 			-- The timer should not be done yet and should execute asynchronously.
 			assert.is.False(done)
 
-			spawned_task:wait(100, 20)
+			spawned_task:await(100, 20)
 			assert.is.True(done)
 		end)
 
@@ -25,7 +25,7 @@ describe("coop.uv", function()
 				return vim.api.nvim_get_current_line()
 			end)
 
-			local result = spawned_task:wait(100, 20)
+			local result = spawned_task:await(100, 20)
 			assert.are.same("", result)
 		end)
 	end)

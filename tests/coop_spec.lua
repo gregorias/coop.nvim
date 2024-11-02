@@ -151,7 +151,7 @@ describe("coop", function()
 			local f_ret_0 = nil
 			local f_ret_1 = nil
 
-			f_future:await_cb(function(success_, a, b)
+			f_future:await(function(success_, a, b)
 				success, f_ret_0, f_ret_1 = success_, a, b
 			end)
 
@@ -170,7 +170,7 @@ describe("coop", function()
 			local success = true
 			local f_err = ""
 
-			f_future:await_cb(function(success_, err)
+			f_future:await(function(success_, err)
 				success, f_err = success_, err
 			end)
 

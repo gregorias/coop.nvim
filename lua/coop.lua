@@ -80,7 +80,7 @@ M.await_all = function(futures)
 	end
 
 	for i, f in ipairs(futures) do
-		f:await_cb(function(...)
+		f:await(function(...)
 			results[i] = { ... }
 			done_count = done_count + 1
 			if done_count == #futures and task.status(this) == "suspended" then

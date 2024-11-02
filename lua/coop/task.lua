@@ -19,8 +19,6 @@ local M = {}
 ---@field status fun(Task): string returns the task’s status
 ---
 ---@field await function awaits the task
----@field await_cb function awaits the task
----@field wait function synchronously waits for the task
 
 local running_task = nil
 
@@ -48,12 +46,6 @@ M.create = function(tf)
 
 			await = function(self, ...)
 				return self.future:await(...)
-			end,
-			await_cb = function(self, ...)
-				return self.future:await_cb(...)
-			end,
-			wait = function(self, ...)
-				return self.future:wait(...)
 			end,
 		},
 		__call = function(self, ...)
