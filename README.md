@@ -42,7 +42,18 @@ Install the plugin with your preferred package manager, such as [Lazy]:
 
 ## 🚀 Usage
 
-### Interface Guide
+### Examples tutorial
+
+A good introduction to Coop or any framework is to look at code examples.
+Check out [`lua/coop/examples.lua`](/lua/coop/examples.lua):
+
+`search_for_readme` shows a hello world of asynchronicity: filesystem operations.
+Notice that, although `search_for_readme` is non-blocking, it looks _exactly_
+like its synchronous counterpart would look like.
+One tiny caveat is that you need to spawn it in your main, synchronous thread:
+`coop.spawn(search_for_readme)`.
+
+### Interface guide
 
 #### Task
 
