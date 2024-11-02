@@ -68,6 +68,23 @@ with error handling.
 
 #### Task
 
+### FAQ
+
+#### How do I block until an asynchronous function is done in synchronous code?
+
+Asynchronous code doesn’t mix with synchronous functions.
+If you need to wait in your synchronous code until an asynchronous task is
+done, Coop implements a busy-waiting mechanism based on `vim.wait`:
+
+```lua
+--- This is a synchronous function.
+function main()
+  local task = coop.spawn(...)
+  -- Wait for 5 seconds and poll every 20 milliseconds.
+  return task:await(5000, 20)
+end
+```
+
 ## ✅ Comparison to similar tools
 
 ### Nio
