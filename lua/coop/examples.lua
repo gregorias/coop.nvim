@@ -1,5 +1,7 @@
 local M = {}
 local coop = require("coop")
+local copcall = require("coop.coroutine-utils").copcall
+local await_any = require("coop.control").await_any
 local as_completed = require("coop.control").as_completed
 local uv = require("coop.uv")
 
@@ -84,6 +86,41 @@ M.sort_with_time = function(values)
 	end
 
 	return sorted_results
+end
+
+--- Runs a simulated parallel search.
+---
+--- This example shows cancellation and error handling.
+---
+---@async
+---@return string result the result of the fast task
+---@return string result the result of the slow task
+M.run_parallel_search = function()
+	local slow_tf = function()
+		local success, err_msg = copcall(uv.sleep, 5000)
+		if not success and err_msg == "cancelled" then
+			return "cancelled"
+		else
+			return "slow"
+		end
+	end
+
+	local fast_tf = function()
+		local success, err_msg = copcall(uv.sleep, 30)
+		if not success and err_msg == "cancelled" then
+			return "cancelled"
+		else
+			return "fast"
+		end
+	end
+
+	local slow_task, fast_task = coop.spawn(slow_tf), coop.spawn(fast_tf)
+	local done_task, remaining_tasks = await_any({ slow_task, fast_task })
+	for _, task in ipairs(remaining_tasks) do
+		task:cancel()
+	end
+
+	return done_task(), remaining_tasks[1]()
 end
 
 return M

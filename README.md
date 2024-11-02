@@ -58,6 +58,9 @@ It launches parallel timers with `coop.spawn` and uses a
 `coop.control.as_completed` to conveniently capture results as each timer
 completes.
 
+`run_parallel_search` is the final example and it shows the flexible
+cancellation mechanism together with error handling.
+
 ### Interface guide
 
 #### Task
