@@ -1,14 +1,14 @@
 --- Utilities for working with coroutines.
 local M = {}
 
---- Executes a plain coroutine function in a protected mode.
+--- Executes a coroutine function in a protected mode.
 ---
---- This is also a plain coroutine function.
+--- This is also a coroutine function.
 ---
 --- copcall is a coroutine alternative to pcall. pcall is not suitable for coroutines, because yields can’t cross a
 --- pcall. copcall goes around that restriction by using coroutine.resume.
 ---
----@param f_co function A plain coroutine function to execute.
+---@param f_co function A coroutine function to execute.
 ---@return boolean success Whether the coroutine function executed successfully.
 ---@return ... The results of the coroutine function.
 M.copcall = function(f_co, ...)
