@@ -40,4 +40,17 @@ M.cb_to_tf = function(f)
 	return f_tf
 end
 
+--- Spawns a task function in a thread.
+---
+--- The returned task can be turned back into a task function.
+--- spawn(f_co, ...)() is semantically the same as f_co(...)
+---
+---@param f_co function The task function to spawn.
+---@return Task task the spawned task
+M.spawn = function(f_co, ...)
+	local spawned_task = task.create(f_co)
+	task.resume(spawned_task, ...)
+	return spawned_task
+end
+
 return M
