@@ -23,10 +23,10 @@ local schedule_cb = function(f, cb_pos)
 end
 
 local wrap = function(f, cb_pos)
-	return coop.cb_to_co(schedule_cb(f, cb_pos))
+	return coop.cb_to_tf(schedule_cb(f, cb_pos))
 end
 
-M.timer_start = coop.cb_to_co(schedule_cb(shift_cb(vim.uv.timer_start)))
+M.timer_start = coop.cb_to_tf(schedule_cb(shift_cb(vim.uv.timer_start)))
 M.fs_open = wrap(vim.uv.fs_open, 4)
 M.fs_close = wrap(vim.uv.fs_close, 2)
 M.fs_fstat = wrap(vim.uv.fs_fstat, 2)
