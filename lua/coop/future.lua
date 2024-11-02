@@ -91,9 +91,7 @@ end
 ---@param self Future the future
 ---@return any results the results of the task function
 M.Future.await_tf = function(self)
-	if self.done then
-		return unpack(self.results)
-	else
+	if not self.done then
 		local task = require("coop.task")
 		local this = task.running()
 		if this == nil then
@@ -104,12 +102,13 @@ M.Future.await_tf = function(self)
 			task.resume(this, ...)
 		end)
 
-		local results = { task.yield() }
-		if results[1] then
-			return unpack(results, 2, #results)
-		else
-			error(results[2], 0)
-		end
+		task.yield()
+	end
+
+	if self.results[1] then
+		return unpack(self.results, 2, #self.results)
+	else
+		error(self.results[2], 0)
 	end
 end
 

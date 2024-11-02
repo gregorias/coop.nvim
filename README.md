@@ -53,6 +53,11 @@ like its synchronous counterpart would look like.
 One tiny caveat is that you need to spawn it in your main, synchronous thread:
 `coop.spawn(search_for_readme)`.
 
+`sort_with_time` shows that Coop achieves true parallelism.
+It launches parallel timers with `coop.spawn` and uses a
+`coop.control.as_completed` to conveniently capture results as each timer
+completes.
+
 ### Interface guide
 
 #### Task

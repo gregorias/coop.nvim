@@ -53,8 +53,7 @@ describe("coop", function()
 			local f = function(cb, a, b)
 				cb(a + b)
 			end
-			local success, f_co_ret = coop.spawn(coop.cb_to_co(f), 1, 2):await()
-			assert.is.True(success)
+			local f_co_ret = coop.spawn(coop.cb_to_co(f), 1, 2):await()
 			assert.are.same(3, f_co_ret)
 		end)
 
@@ -63,9 +62,8 @@ describe("coop", function()
 				cb(a + b, a * b)
 			end
 
-			local success, f_co_ret_sum, f_co_ret_mul = coop.spawn(coop.cb_to_co(f), 1, 2):await()
+			local f_co_ret_sum, f_co_ret_mul = coop.spawn(coop.cb_to_co(f), 1, 2):await()
 
-			assert.is.True(success)
 			assert.are.same(3, f_co_ret_sum)
 			assert.are.same(2, f_co_ret_mul)
 		end)

@@ -1,5 +1,6 @@
 local M = {}
 local coop = require("coop")
+local as_completed = require("coop.control").as_completed
 local uv = require("coop.uv")
 
 --- Gets the size of a file.
@@ -60,28 +61,27 @@ end
 
 --- Sorts a list of numbers by waiting for the time of each number.
 ---
---- This is a plain coroutine function.
----
 --- This is a good example of true parallelism enabled by this framework (each timer is working in parallel) and
---- `await_all` for synchronization.
+--- `as_complete` for synchronization.
 ---
 ---@async
 ---@param values number[] the values to sort
 ---@return number[] sorted_values the sorted values
 M.sort_with_time = function(values)
-	local futures = {}
-	local sorted_results = {}
+	local tasks = {}
 
 	-- For each number, create a task that sleeps for that number of milliseconds.
-	for _, value in ipairs(values) do
-		local future = coop.spawn(function()
+	for i, value in ipairs(values) do
+		tasks[i] = coop.spawn(function()
 			uv.sleep(value)
-			table.insert(sorted_results, value)
+			return value
 		end)
-		table.insert(futures, future)
 	end
 
-	coop.await_all(futures)
+	local sorted_results = {}
+	for t in as_completed(tasks) do
+		sorted_results[#sorted_results + 1] = t()
+	end
 
 	return sorted_results
 end
