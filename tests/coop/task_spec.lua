@@ -38,6 +38,21 @@ describe("coop.task", function()
 			assert.are.same("cancelled", err_msg)
 		end)
 
+		it("can uncancelled by user", function()
+			local spawned_task = coop.spawn(function()
+				copcall(uv.sleep, 20)
+				return "done"
+			end)
+
+			-- Immediately cancel the task.
+			spawned_task:cancel()
+
+			local result = spawned_task:await(50, 10)
+
+			assert.is.False(spawned_task.cancelled)
+			assert.are.same("done", result)
+		end)
+
 		it("doesn’t do anything on finished tasks", function()
 			local spawned_task = coop.spawn(function() end)
 			spawned_task:cancel()
@@ -48,6 +63,7 @@ describe("coop.task", function()
 			local success, err = true, ""
 
 			coop.spawn(function()
+				---@diagnostic disable-next-line: cast-local-type
 				success, err = pcall(task.cancel, task.running())
 			end)
 
@@ -66,9 +82,9 @@ describe("coop.task", function()
 		end)
 	end)
 
-	describe("yield", function ()
+	describe("yield", function()
 		it("throws if used outside of a task", function()
-			local t = task.create(function ()
+			local t = task.create(function()
 				task.yield()
 			end)
 
@@ -76,8 +92,10 @@ describe("coop.task", function()
 			local success, err_msg = coroutine.resume(t.thread)
 
 			assert.is.False(success)
-			assert.are.same("coroutine.yield returned without a running task. Make sure that you use task.resume to resume tasks.", err_msg)
+			assert.are.same(
+				"coroutine.yield returned without a running task. Make sure that you use task.resume to resume tasks.",
+				err_msg
+			)
 		end)
-
 	end)
 end)

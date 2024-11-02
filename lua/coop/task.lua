@@ -12,7 +12,7 @@ local M = {}
 ---@class Task
 ---@field thread thread the coroutine thread
 ---@field future Future the future for the coroutine
----@field cancelled boolean whether the task has been cancelled
+---@field cancelled boolean true if the user has requested cancellation
 ---
 ---@field cancel fun(Task) cancels the task
 ---@field resume fun(Task, ...) resumes the task
@@ -123,6 +123,8 @@ M.yield = function()
 	end
 
 	if this.cancelled then
+		-- Clear the cancelled flag, so the the user can ignore it.
+		this.cancelled = false
 		error("cancelled", 0)
 	end
 
