@@ -36,6 +36,9 @@ globals:
   assert.is.True:
     args:
       - type: bool
+  assert.is.Nil:
+    args:
+      - type: any
   before_each:
     args:
       - type: function

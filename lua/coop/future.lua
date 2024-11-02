@@ -146,7 +146,7 @@ M.Future.wait = function(self, timeout, interval)
 		if self.results[1] then
 			return unpack(self.results, 2, #self.results)
 		else
-			error(self.results[2])
+			error(self.results[2], 0)
 		end
 	else
 		return
