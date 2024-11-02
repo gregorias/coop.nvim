@@ -1,8 +1,8 @@
 --- The main module containing for Coop’s utility functions.
 local M = {}
 
-local task = require("coop.task")
-
+M.task = require("coop.task")
+local task = M.task
 M.Future = require("coop.future").Future
 M.cb_to_tf = require("coop.task-utils").cb_to_tf
 M.spawn = require("coop.task-utils").spawn
