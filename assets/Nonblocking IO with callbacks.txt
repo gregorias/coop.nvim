@@ -1,0 +1,12 @@
+source: sequencediagram.org
+title Nonblocking IO with callbacks
+
+participant Main Thread
+
+activate Main Thread
+Main Thread->I/O: fs_read_cb
+activate I/O
+I/O-->>Main Thread: yield
+
+I/O->I/O: cb()
+deactivate I/O

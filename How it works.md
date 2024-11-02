@@ -3,6 +3,20 @@
 This document is a guide explaining the design and implementation of Coop’s
 internals.
 
+## Using callbacks to build coroutines
+
+Neovim already provides non-blocking operations through the use of callbacks.
+
+![A sequence diagram of nonblocking I/O with callbacks](/assets/Nonblocking%20IO%20with%20callbacks.png)
+
+Conceptually, there’s some I/O thread (e.g., a Libuv event loop) that works
+parallel to the main thread.
+When we start a non-blocking operation, we only schedule that operation on the
+I/O thread.
+The I/O thread yields to the main thread and once the scheduled operation is
+ready, calls the callback.
+It works, but results in hard to manage code.
+
 ## copcall
 
 In Lua 5.1, `pcall` and coroutine functions do not mix.
