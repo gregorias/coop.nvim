@@ -7,7 +7,7 @@ internals.
 
 Neovim already provides non-blocking operations through the use of callbacks.
 
-![A sequence diagram of nonblocking I/O with callbacks](/assets/Nonblocking%20IO%20with%20callbacks.png)
+![A sequence diagram of non-blocking I/O with callbacks](/assets/Nonblocking%20IO%20with%20callbacks.png)
 
 Conceptually, there’s some I/O thread (e.g., a Libuv event loop) that works
 parallel to the main thread.
@@ -16,6 +16,23 @@ I/O thread.
 The I/O thread yields to the main thread and once the scheduled operation is
 ready, calls the callback.
 It works, but results in hard to manage code.
+
+We can turn any such non-blocking function into a coroutine like so:
+
+![A sequence diagram of non-blocking I/O with a coroutine](/assets/Nonblocking%20IO%20with%20coroutines.png)
+
+What happens here is:
+
+1. The coroutine yields as soon as the non-blocking operation yields as well.
+2. The callback provided to the I/O thread only resumes the coroutine with the
+   results.
+
+This neaty wrapper keeps the non-blocking property.
+Coroutines’ multi-entry operation makes it all seem sequential.
+
+Luckily for us, conversion from callbacks to coroutines can be written
+generically. I’ve provided a recipe for it in [my blog post](https://gregorias.github.io/posts/using-coroutines-in-neovim-lua/)
+and it also exists in Coop as `cb_to_tf`.
 
 ## copcall
 

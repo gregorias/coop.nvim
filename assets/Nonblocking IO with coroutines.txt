@@ -1,0 +1,22 @@
+source: sequencediagram.org
+title Nonblocking IO with coroutines
+
+participant Main Thread
+
+activate Main Thread
+Main Thread->Read Coroutine: fs_read_co
+activate Read Coroutine
+Read Coroutine->I/O: fs_read_cb
+activate I/O
+I/O-->>Read Coroutine: yield
+Read Coroutine->>Main Thread: yield
+deactivate Read Coroutine
+
+I/O->Read Coroutine: cb() (coroutine.resume)
+activate Read Coroutine
+deactivate Main Thread
+
+Read Coroutine->>I/O: return
+deactivate Read Coroutine
+deactivate I/O
+activate Main Thread
