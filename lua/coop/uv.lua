@@ -1,4 +1,4 @@
---- This module provides fire-and-forget coroutine functions for Libuv.
+--- This module provides task function versions of vim.uv functions.
 local M = {}
 
 local coop = require("coop")
@@ -36,8 +36,7 @@ M.fs_closedir = wrap(vim.uv.fs_closedir, 2)
 
 --- Sleeps for a number of milliseconds.
 ---
---- This is a fire-and-forget coroutine function.
----
+---@async
 ---@param ms number The number of milliseconds to sleep.
 M.sleep = function(ms)
 	local timer = vim.uv.new_timer()
