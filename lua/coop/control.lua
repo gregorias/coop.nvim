@@ -1,5 +1,7 @@
 --- Various utilities for async control flow.
 local M = {}
+
+local task = require("coop.task")
 local Future = require("coop.future").Future
 
 ---@alias Awaitable Future|Task
@@ -29,6 +31,40 @@ M.await_any = function(aws)
 	local aw_pos, aw = future()
 	table.remove(aws, aw_pos)
 	return aw, aws
+end
+
+--- Awaits all awaitables in the list.
+---
+--- This is a task function.
+---
+---@async
+---@param aws Awaitable[]
+---@return table results The results of the awaitables.
+M.await_all = function(aws)
+	local done_count = 0
+	local this = task.running()
+	if this == nil then
+		error("await_all can only be used in a task.")
+	end
+	local results = {}
+	for _ = 1, #aws do
+		table.insert(results, nil)
+	end
+
+	for i, f in ipairs(aws) do
+		f:await(function(...)
+			results[i] = { ... }
+			done_count = done_count + 1
+			if done_count == #aws and task.status(this) == "suspended" then
+				task.resume(this)
+			end
+		end)
+	end
+
+	if done_count < #aws then
+		task.yield()
+	end
+	return results
 end
 
 --- Asynchronously iterates over the given awaitables and waits for each to complete.

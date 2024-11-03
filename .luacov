@@ -5,6 +5,7 @@ return {
     "lua/coop/coroutine-utils$",
     "lua/coop/future$",
     "lua/coop/task$",
+    "lua/coop/task-utils$",
     "lua/coop/uv$",
   },
   modules = {
@@ -13,6 +14,7 @@ return {
     ["coop.coroutine-utils"] = "lua/coop/coroutine-utils.lua",
     ["coop.future"] = "lua/coop/future.lua",
     ["coop.task"] = "lua/coop/task.lua",
+    ["coop.task-utils"] = "lua/coop/task-utils.lua",
     ["coop.uv"] = "lua/coop/uv.lua",
   },
   reporter = "html",
