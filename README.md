@@ -68,7 +68,70 @@ with error handling through `copcall`.
 
 ### Interface guide
 
+This section introduces the essential interfaces.
+
 #### Task
+
+The main abstraction of Coop is a **task**.
+A **task** is an extension of a Lua coroutine with three capabilities:
+
+- Holding results (including errors)
+- Awaiting
+- Cancellation
+
+A task behaves like a coroutine and comes with its own equivalent functions that behave analogously:
+
+```lua
+task.create
+task.resume
+task.yield
+task.status
+task.running
+```
+
+`task.create` accepts **task functions**, which is a function that may call `task.yield`.
+
+Tasks come with two additional functions. A cancel function (which is also a method):
+
+```lua
+--- Cancels the task.
+---
+--- The cancelled task will throw `error("cancelled")` in its yield.
+---
+---@param task Task the task to cancel
+function task.cancel(task)
+  -- …
+end
+```
+
+An await method that has three variants:
+
+```lua
+-- Awaits task completion.
+function task.await(task, cb_or_timeout, interval)
+end
+
+-- task.await() is a task function that waits for the task finish and return a result
+result = task.await()
+
+-- task.await(cb) is a callback-based function that calls the callback once the task is finished.
+-- It doesn’t wait for the task.
+task.await(function(success, result) end)
+
+-- task.await(timeout, interval) is a blocking function that uses vim.wait to implement a busy-waiting loop.
+task.await(1000, 100) -- Wait for 1s for the task to finish. Check every 100ms
+```
+
+Tasks implement a call operator that calls `await`. This allows for a fluent interface where tasks appear as
+if they were regular task functions:
+
+```lua
+local get_result_1 = coop.spawn(compute, 100)
+local get_result_2 = coop.spawn(compute, 200)
+local result = get_result_1()
+```
+
+The essential task-related functions live in `coop.task` and `coop.task-utils` modules.
 
 ### FAQ
 

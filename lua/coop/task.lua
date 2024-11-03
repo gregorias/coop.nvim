@@ -79,6 +79,8 @@ end
 
 --- Cancels a task.
 ---
+--- The cancelled task will throw `error("cancelled")` in its yield.
+---
 ---@param task Task the task to cancel
 M.cancel = function(task)
 	local task_status = M.status(task)
