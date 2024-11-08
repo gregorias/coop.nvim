@@ -2,6 +2,7 @@
 local M = {}
 
 local coop = require("coop")
+local copcall = require("coop").copcall
 
 --- Wraps the callback param with `vim.schedule_wrap`.
 ---
@@ -51,9 +52,13 @@ M.fs_closedir = wrap(vim.uv.fs_closedir)
 ---@param ms number The number of milliseconds to sleep.
 M.sleep = function(ms)
 	local timer = vim.uv.new_timer()
-	M.timer_start(timer, ms, 0)
+	local success, err = copcall(M.timer_start, timer, ms, 0)
+	-- Safely close resources even in case of a cancellation error.
 	timer:stop()
 	timer:close()
+	if not success then
+		error(err, 0)
+	end
 end
 
 return M

@@ -5,6 +5,7 @@ M.task = require("coop.task")
 M.Future = require("coop.future").Future
 M.cb_to_tf = require("coop.task-utils").cb_to_tf
 M.spawn = require("coop.task-utils").spawn
+M.copcall = require("coop.coroutine-utils").copcall
 
 -- Control utilities.
 local control = require("coop.control")

@@ -28,5 +28,20 @@ describe("coop.uv", function()
 			local result = spawned_task:await(100, 20)
 			assert.are.same("", result)
 		end)
+
+		it("handles cancellation", function()
+			local done = false
+
+			local spawned_task = coop.spawn(function()
+				uv.sleep(50)
+				done = true
+			end)
+			spawned_task:cancel()
+
+			assert.has.error(function()
+				spawned_task:await(1, 2)
+			end, "cancelled")
+			assert.is.False(done)
+		end)
 	end)
 end)
