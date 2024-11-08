@@ -1,6 +1,8 @@
 --- This module provides a task implementation.
 local M = {}
 
+local pack = require("coop.table-utils").pack
+
 --- A task is an extension of Lua coroutine.
 ---
 --- A task enhances Lua coroutine with:
@@ -67,14 +69,14 @@ M.resume = function(task, ...)
 
 	local previous_task = M.running()
 	running_task = task
-	local results = { coroutine.resume(task.thread, ...) }
+	local results = pack(coroutine.resume(task.thread, ...))
 	running_task = previous_task
 
 	if not results[1] then
 		task.future:set_error(results[2])
 	end
 
-	return unpack(results)
+	return unpack(results, 1, results.n)
 end
 
 --- Cancels a task.
