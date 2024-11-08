@@ -118,7 +118,7 @@ end
 ---@async
 ---@return any ... the arguments passed to task.resume
 M.yield = function()
-	local args = { coroutine.yield() }
+	local args = pack(coroutine.yield())
 
 	local this = M.running()
 
@@ -132,7 +132,7 @@ M.yield = function()
 		error("cancelled", 0)
 	end
 
-	return unpack(args)
+	return unpack(args, 1, args.n)
 end
 
 --- Returns the status of a task’s thread.
