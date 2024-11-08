@@ -4,6 +4,9 @@ local M = {}
 local pack = require("coop.table-utils").pack
 local task = require("coop.task")
 
+-- ADR: cb_to_tf’s argument accepts a callback as its first argument. This keeps the implementation straightforward and
+-- focused.
+
 --- Converts a callback-based function to a task function.
 ---
 --- If the callback is called asynchronously, then the task function yields exactly once and is resumed by whoever
