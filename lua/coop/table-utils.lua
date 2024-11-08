@@ -25,6 +25,21 @@ M.unpack_packed = function(packed)
 	return unpack(packed, 1, packed.n)
 end
 
+--- Safely inserts an element into a list.
+---
+--- Safe here means that this insert considers nil values in the list.
+---
+---@param t table The list to insert into.
+---@param pos number The position to insert at.
+---@param len number The size of t.
+---@param v any The value to insert.
+M.safe_insert = function(t, pos, len, v)
+	for i = len + 1, pos + 1, -1 do
+		t[i] = t[i - 1]
+	end
+	t[pos] = v
+end
+
 --- Shifts elements of a list to the left.
 ---
 ---@param t table The list to shift.

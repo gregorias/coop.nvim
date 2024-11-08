@@ -16,8 +16,12 @@ local schedule_cb = function(f, cb_pos)
 	cb_pos = cb_pos or 1
 
 	return function(cb, ...)
-		local args = { ... }
-		table.insert(args, cb_pos, vim.schedule_wrap(cb))
+		local pack = require("coop.table-utils").pack
+		local unpack = require("coop.table-utils").unpack_packed
+		local safe_insert = require("coop.table-utils").safe_insert
+		local args = pack(...)
+		safe_insert(args, cb_pos, args.n, vim.schedule_wrap(cb))
+		args.n = args.n + 1
 		f(unpack(args))
 	end
 end

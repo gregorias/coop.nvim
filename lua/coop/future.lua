@@ -43,7 +43,7 @@ M.Future.complete = function(self, ...)
 	self.results = pack(true, ...)
 	self.done = true
 	for _, cb in ipairs(self.queue) do
-		cb(unpack(self.results))
+		cb(unpack(self.results, 1, self.results.n))
 	end
 	self.queue = {}
 end
@@ -60,7 +60,7 @@ M.Future.set_error = function(self, err)
 	self.results = { [1] = false, [2] = err, n = 2 }
 	self.done = true
 	for _, cb in ipairs(self.queue) do
-		cb(unpack(self.results))
+		cb(unpack(self.results, 1, self.results.n))
 	end
 	self.queue = {}
 end
