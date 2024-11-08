@@ -127,7 +127,7 @@ M.yield = function()
 	end
 
 	if this.cancelled then
-		-- Clear the cancelled flag, so the the user can ignore it.
+		-- Clear the cancelled flag, so that the user can ignore it.
 		this.cancelled = false
 		error("cancelled", 0)
 	end
