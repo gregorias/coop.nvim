@@ -32,7 +32,7 @@ end
 ---
 ---@param f function
 ---@param cb_pos? number|string the position of the callback parameter
----@return function tf
+---@return async function tf
 local wrap = function(f, cb_pos)
 	return coop.cb_to_tf(schedule_cb(f, cb_pos))
 end

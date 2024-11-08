@@ -4,17 +4,14 @@ local M = {}
 local pack = require("coop.table-utils").pack
 local task = require("coop.task")
 
--- ADR: cb_to_tf’s argument accepts a callback as its first argument. This keeps the implementation straightforward and
--- focused.
-
 --- Converts a callback-based function to a task function.
 ---
 --- If the callback is called asynchronously, then the task function yields exactly once and is resumed by whoever
 --- calls the callback. If the callback is called synchronously, then the task function returns immediately.
 ---
 ---@param  f function The function to convert. The callback needs to be its first argument.
----@return function tf A task function. Accepts the same arguments as f without the callback.
----                    Returns what f has passed to the callback.
+---@return async function tf A task function. Accepts the same arguments as f without the callback.
+---                          Returns what f has passed to the callback.
 M.cb_to_tf = function(f)
 	local f_tf = function(...)
 		local this = task.running()
