@@ -111,14 +111,31 @@ end
 
 --- Yields the current task.
 ---
---- This is a coroutine function.
----
 --- If inside a cancelled task, it throws an error message "cancelled".
 ---
 ---@async
+---@param ... ... the arguments
 ---@return any ... the arguments passed to task.resume
-M.yield = function()
-	local args = pack(coroutine.yield())
+M.yield = function(...)
+	local args = pack(M.pyield(...))
+
+	if args[1] == true then
+		return unpack(args, 2, args.n)
+	else
+		error(args[2], 0)
+	end
+end
+
+--- Yields the current task.
+---
+--- `p` stands for "protected" like in `pcall`.
+---
+---@async
+---@param ... ... the arguments
+---@return boolean success true iff the task was not cancelled
+---@return any ... the arguments passed to task.resume or "cancelled"
+M.pyield = function(...)
+	local args = pack(coroutine.yield(...))
 
 	local this = M.running()
 
@@ -129,10 +146,10 @@ M.yield = function()
 	if this.cancelled then
 		-- Clear the cancelled flag, so that the user can ignore it.
 		this.cancelled = false
-		error("cancelled", 0)
+		return false, "cancelled"
 	end
 
-	return unpack(args, 1, args.n)
+	return true, unpack(args, 1, args.n)
 end
 
 --- Returns the status of a task’s thread.

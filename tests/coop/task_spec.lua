@@ -97,5 +97,17 @@ describe("coop.task", function()
 				err_msg
 			)
 		end)
+
+		it("throws if cancelled", function()
+			local t = task.create(function()
+				task.yield()
+			end)
+
+			t:cancel()
+			local success, err_msg = t:resume()
+
+			assert.is.False(success)
+			assert.are.same("cancelled", err_msg)
+		end)
 	end)
 end)

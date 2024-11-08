@@ -32,17 +32,30 @@ end
 --- Wraps a Libuv function into a task function.
 ---
 ---@param f function
+---@param cb2tf_opts? CbToTfOpts
 ---@param cb_pos? number|string the position of the callback parameter
 ---@return async function tf
-local wrap = function(f, cb_pos)
-	return coop.cb_to_tf(schedule_cb(f, cb_pos))
+local wrap = function(f, cb2tf_opts, cb_pos)
+	return coop.cb_to_tf(schedule_cb(f, cb_pos), cb2tf_opts)
 end
 
 M.timer_start = wrap(vim.uv.timer_start)
-M.fs_open = wrap(vim.uv.fs_open)
+M.fs_open = wrap(vim.uv.fs_open, {
+	cleanup = function(err, fd)
+		if not err then
+			vim.uv.fs_close(fd)
+		end
+	end,
+})
 M.fs_close = wrap(vim.uv.fs_close)
 M.fs_fstat = wrap(vim.uv.fs_fstat)
-M.fs_opendir = wrap(vim.uv.fs_opendir, 2)
+M.fs_opendir = wrap(vim.uv.fs_opendir, {
+	cleanup = function(err, dir)
+		if not err then
+			vim.uv.fs_closedir(dir)
+		end
+	end,
+}, 2)
 M.fs_readdir = wrap(vim.uv.fs_readdir)
 M.fs_closedir = wrap(vim.uv.fs_closedir)
 

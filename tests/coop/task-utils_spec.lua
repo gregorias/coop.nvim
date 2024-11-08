@@ -1,6 +1,7 @@
 --- Busted tests for coop.task-utils.
 local coop = require("coop")
 local task = require("coop.task")
+local pack = require("coop.table-utils").pack
 
 --- Creates a cb function that blocks until a resume function is called.
 ---
@@ -11,15 +12,17 @@ local task = require("coop.task")
 ---@return function cb_function cb function
 ---@return function f_resume The resume function.
 local create_blocked_cb_function = function(f)
-	local future = coop.Future.new()
+	local cb = function() end
 
 	local f_resume = function()
-		future:complete()
+		cb()
 	end
 
-	local cb_function = function(cb, ...)
-		future:await()
-		cb(f(...))
+	local cb_function = function(cb_, ...)
+		local args = pack(...)
+		cb = function()
+			cb_(f(unpack(args, 1, args.n)))
+		end
 	end
 
 	return cb_function, f_resume
@@ -49,11 +52,13 @@ end
 
 describe("coop.task-utils", function()
 	describe("cb_to_tf", function()
+		local cb_to_tf = coop.cb_to_tf
+
 		it("converts an immediate callback-based function to a task function", function()
 			local f = function(cb, a, b)
 				cb(a + b)
 			end
-			local f_tf_ret = coop.spawn(coop.cb_to_tf(f), 1, 2):await()
+			local f_tf_ret = coop.spawn(cb_to_tf(f), 1, 2):await()
 			assert.are.same(3, f_tf_ret)
 		end)
 
@@ -62,7 +67,7 @@ describe("coop.task-utils", function()
 				cb(a + b, nil, a * b)
 			end
 
-			local f_tf_ret_sum, f_tf_nil, f_tf_ret_mul = coop.spawn(coop.cb_to_tf(f), 1, 2):await()
+			local f_tf_ret_sum, f_tf_nil, f_tf_ret_mul = coop.spawn(cb_to_tf(f), 1, 2):await()
 
 			assert.are.same(3, f_tf_ret_sum)
 			assert.is.Nil(f_tf_nil)
@@ -77,7 +82,7 @@ describe("coop.task-utils", function()
 
 			-- Spawn the coroutine, which will call f and yield.
 			coop.spawn(function()
-				f_tf_ret_sum, f_tf_nil, f_tf_ret_mul = coop.cb_to_tf(f)(1, 2)
+				f_tf_ret_sum, f_tf_nil, f_tf_ret_mul = cb_to_tf(f)(1, 2)
 			end)
 
 			-- Simulate the callback being called asynchronously.
@@ -86,6 +91,34 @@ describe("coop.task-utils", function()
 			assert.are.same(3, f_tf_ret_sum)
 			assert.is.Nil(f_tf_nil)
 			assert.are.same(2, f_tf_ret_mul)
+		end)
+
+		it("runs cleanup function on cancel", function()
+			local on_cancel_called, cleanup_called = false, false
+			local f, f_resume = create_blocked_cb_function(function() end)
+
+			local f_tf = cb_to_tf(f, {
+				on_cancel = function()
+					on_cancel_called = true
+				end,
+				cleanup = function()
+					cleanup_called = true
+				end,
+			})
+
+			local t = coop.spawn(f_tf)
+			t:cancel()
+
+			assert.has.error(function()
+				t:await(10, 2)
+			end, "cancelled")
+			assert.is.True(on_cancel_called)
+			assert.is.False(cleanup_called)
+
+			f_resume()
+
+			assert.is.True(on_cancel_called)
+			assert.is.True(cleanup_called)
 		end)
 	end)
 
