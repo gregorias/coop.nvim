@@ -57,18 +57,18 @@ end
 ---@return ... The results of the coroutine function.
 M.copcall = function(f_co, ...)
 	local thread = coroutine.create(f_co)
-	local results = { coroutine.resume(thread, ...) }
+	local results = pack(coroutine.resume(thread, ...))
 	while true do
 		if not results[1] then
 			return false, results[2]
 		end
 
 		if coroutine.status(thread) == "dead" then
-			return true, unpack(results, 2)
+			return true, unpack(results, 2, results.n)
 		end
 
-		local args = { coroutine.yield() }
-		results = { coroutine.resume(thread, unpack(args)) }
+		local args = pack(coroutine.yield())
+		results = pack(coroutine.resume(thread, unpack(args, 1, args.n)))
 	end
 end
 

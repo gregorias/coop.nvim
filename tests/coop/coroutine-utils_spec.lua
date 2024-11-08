@@ -96,16 +96,18 @@ describe("coop.coroutine-utils", function()
 		it("executes a successful coroutine function in a protected mode", function()
 			local throw_after_sleep = function()
 				uv.sleep(2)
-				return "foo"
+				return "foo", nil, "bar"
 			end
 			local f_co = function()
 				return copcall(throw_after_sleep)
 			end
 
-			local success, val = coop.spawn(f_co):await(5, 1)
+			local success, val_foo, val_nil, val_bar = coop.spawn(f_co):await(5, 1)
 
 			assert.is.True(success)
-			assert.are.same("foo", val)
+			assert.are.same("foo", val_foo)
+			assert.is.Nil(val_nil)
+			assert.are.same("bar", val_bar)
 		end)
 	end)
 end)
