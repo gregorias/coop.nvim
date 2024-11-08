@@ -53,71 +53,39 @@ describe("coop.task-utils", function()
 			local f = function(cb, a, b)
 				cb(a + b)
 			end
-			local f_co_ret = coop.spawn(coop.cb_to_tf(f), 1, 2):await()
-			assert.are.same(3, f_co_ret)
+			local f_tf_ret = coop.spawn(coop.cb_to_tf(f), 1, 2):await()
+			assert.are.same(3, f_tf_ret)
 		end)
 
 		it("works with an immediate callback-based function that returns multiple results", function()
 			local f = function(cb, a, b)
-				cb(a + b, a * b)
+				cb(a + b, nil, a * b)
 			end
 
-			local f_co_ret_sum, f_co_ret_mul = coop.spawn(coop.cb_to_tf(f), 1, 2):await()
+			local f_tf_ret_sum, f_tf_nil, f_tf_ret_mul = coop.spawn(coop.cb_to_tf(f), 1, 2):await()
 
-			assert.are.same(3, f_co_ret_sum)
-			assert.are.same(2, f_co_ret_mul)
-		end)
-
-		it("converts a delayed callback-based function to a coroutine function", function()
-			local f, f_resume = create_blocked_cb_function(function(a, b)
-				return a + b
-			end)
-			local f_co_ret = nil
-
-			-- Spawn the coroutine, which will call f and yield.
-			coop.spawn(function()
-				f_co_ret = coop.cb_to_tf(f)(1, 2)
-			end)
-
-			-- Simulate the callback being called asynchronously.
-			f_resume()
-
-			assert.are.same(3, f_co_ret)
+			assert.are.same(3, f_tf_ret_sum)
+			assert.is.Nil(f_tf_nil)
+			assert.are.same(2, f_tf_ret_mul)
 		end)
 
 		it("works with a delayed callback-based function that returns multiple results", function()
 			local f, f_resume = create_blocked_cb_function(function(a, b)
-				return a + b, a * b
+				return a + b, nil, a * b
 			end)
-			local f_co_ret_sum, f_co_ret_mul = nil, nil
+			local f_tf_ret_sum, f_tf_nil, f_tf_ret_mul = nil, nil, nil
 
 			-- Spawn the coroutine, which will call f and yield.
 			coop.spawn(function()
-				f_co_ret_sum, f_co_ret_mul = coop.cb_to_tf(f)(1, 2)
+				f_tf_ret_sum, f_tf_nil, f_tf_ret_mul = coop.cb_to_tf(f)(1, 2)
 			end)
 
 			-- Simulate the callback being called asynchronously.
 			f_resume()
 
-			assert.are.same(3, f_co_ret_sum)
-			assert.are.same(2, f_co_ret_mul)
-		end)
-
-		it("works with a delayed callback-based function that returns multiple results with nils", function()
-			local f, f_resume = create_blocked_cb_function(function()
-				return "foo", nil, "bar", nil
-			end)
-			local results = nil
-
-			-- Spawn the coroutine, which will call f and yield.
-			coop.spawn(function()
-				results = { coop.cb_to_tf(f)() }
-			end)
-
-			-- Simulate the callback being called asynchronously.
-			f_resume()
-
-			assert.are.same({ "foo", nil, "bar", nil }, results)
+			assert.are.same(3, f_tf_ret_sum)
+			assert.is.Nil(f_tf_nil)
+			assert.are.same(2, f_tf_ret_mul)
 		end)
 	end)
 

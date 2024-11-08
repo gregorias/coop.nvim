@@ -1,13 +1,15 @@
 --- This module provides a future implementation.
 local M = {}
 
+local pack = require("coop.table-utils").pack
+
 --- A future is a synchronization mechanism that allows waiting for a task to return.
 ---
 --- Futures turn spawned task functions back into task functions as they implement the call operator.
 ---
 ---@class Future
 ---@field done boolean Whether the future is done.
----@field results table The results of the coroutine in pcall/coroutine.resume format.
+---@field results table The results of the coroutine in pcall/coroutine.resume + pack format.
 ---@field queue table The queue of callbacks to be called once the future is done.
 ---
 ---@field complete function A function that marks the future as done with the specified results and calls the callbacks
@@ -38,8 +40,7 @@ M.Future.complete = function(self, ...)
 		error("Tried to complete an already done future.")
 	end
 
-	self.results = { ... }
-	table.insert(self.results, 1, true)
+	self.results = pack(true, ...)
 	self.done = true
 	for _, cb in ipairs(self.queue) do
 		cb(unpack(self.results))
@@ -56,7 +57,7 @@ M.Future.set_error = function(self, err)
 		error("Tried to set an error on an already done future.")
 	end
 
-	self.results = { false, err }
+	self.results = { [1] = false, [2] = err, n = 2 }
 	self.done = true
 	for _, cb in ipairs(self.queue) do
 		cb(unpack(self.results))
@@ -106,7 +107,7 @@ M.Future.await_tf = function(self)
 	end
 
 	if self.results[1] then
-		return unpack(self.results, 2, #self.results)
+		return unpack(self.results, 2, self.results.n)
 	else
 		error(self.results[2], 0)
 	end
@@ -120,7 +121,7 @@ end
 ---@param cb function The callback to call with the results of the coroutine.
 M.Future.await_cb = function(self, cb)
 	if self.done then
-		cb(unpack(self.results))
+		cb(unpack(self.results, 1, self.results.n))
 		return
 	else
 		table.insert(self.queue, cb)
@@ -143,7 +144,7 @@ M.Future.wait = function(self, timeout, interval)
 	end, interval)
 	if self.done then
 		if self.results[1] then
-			return unpack(self.results, 2, #self.results)
+			return unpack(self.results, 2, self.results.n)
 		else
 			error(self.results[2], 0)
 		end

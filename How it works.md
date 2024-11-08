@@ -5,7 +5,9 @@ internals.
 
 ## Using callbacks to build coroutines
 
-Neovim already provides non-blocking operations through the use of callbacks.
+The first hurdle Coop solves is providing non-blocking operations with a
+convenient coroutine syntax. As so happens, Neovim already provides
+non-blocking operations through the use of callbacks:
 
 ![A sequence diagram of non-blocking I/O with callbacks](/assets/Nonblocking%20IO%20with%20callbacks.png)
 
@@ -27,12 +29,12 @@ What happens here is:
 2. The callback provided to the I/O thread only resumes the coroutine with the
    results.
 
-This neaty wrapper keeps the non-blocking property.
+This neaty callback-to-coroutine wrapper keeps the non-blocking property.
 Coroutines’ multi-entry operation makes it all seem sequential.
 
 Luckily for us, conversion from callbacks to coroutines can be written
-generically. I’ve provided a recipe for it in [my blog post](https://gregorias.github.io/posts/using-coroutines-in-neovim-lua/)
-and it also exists in Coop as `cb_to_tf`.
+as a generic function. I’ve provided a recipe for it in [my blog post](https://gregorias.github.io/posts/using-coroutines-in-neovim-lua/)
+and it also exists in Coop as `coroutine-utils.cb_to_co`.
 
 ## copcall
 
