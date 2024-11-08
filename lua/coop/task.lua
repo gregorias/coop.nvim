@@ -73,7 +73,7 @@ M.resume = function(task, ...)
 	running_task = previous_task
 
 	if not results[1] then
-		task.future:set_error(results[2])
+		task.future:error(results[2])
 	end
 
 	return unpack(results, 1, results.n)

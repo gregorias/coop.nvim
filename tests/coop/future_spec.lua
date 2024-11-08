@@ -26,7 +26,7 @@ describe("coop.future", function()
 					success, err = copcall(future.await, future)
 				end)
 
-				future:set_error("foo")
+				future:error("foo")
 				assert.is.False(success)
 				assert.are.same("foo", err)
 			end)

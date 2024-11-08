@@ -14,8 +14,8 @@ local pack = require("coop.table-utils").pack
 ---
 ---@field complete function A function that marks the future as done with the specified results and calls the callbacks
 ---                         in the waiting queue.
----@field set_error function A function that marks the future as finished with an error and calls the callbacks
----                          in the waiting queue.
+---@field error function A function that marks the future as finished with an error and calls the callbacks in the
+---                      waiting queue.
 ---
 ---@field await function Waits for the future to be done.
 M.Future = {}
@@ -52,7 +52,7 @@ end
 ---
 ---@param self Future the future
 ---@param err string the error message
-M.Future.set_error = function(self, err)
+M.Future.error = function(self, err)
 	if self.done then
 		error("Tried to set an error on an already done future.")
 	end
