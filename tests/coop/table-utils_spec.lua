@@ -6,13 +6,13 @@ describe("coop.table-utils", function()
 		it("shifts the elements of a list to the left", function()
 			local t = { 1, 2, 3, 4, 5 }
 
-			table_utils.shift_left(t)
+			table_utils.shift_left(t, #t)
 
 			assert.are.same({ 2, 3, 4, 5, 1 }, t)
 		end)
 
 		it("returns the list unchanged if it is empty", function()
-			assert.are.same({}, table_utils.shift_left({}))
+			assert.are.same({}, table_utils.shift_left({}, 0))
 		end)
 	end)
 
@@ -20,13 +20,13 @@ describe("coop.table-utils", function()
 		it("shifts the elements of a list to the right", function()
 			local t = { 1, 2, 3, 4, 5 }
 
-			table_utils.shift_right(t)
+			table_utils.shift_right(t, 5)
 
 			assert.are.same({ 5, 1, 2, 3, 4 }, t)
 		end)
 
 		it("returns the list unchanged if it is empty", function()
-			assert.are.same({}, table_utils.shift_right({}))
+			assert.are.same({}, table_utils.shift_right({}, 0))
 		end)
 	end)
 end)

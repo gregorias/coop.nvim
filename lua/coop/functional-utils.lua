@@ -9,7 +9,10 @@ local M = {}
 M.shift_parameters = function(f, shift_f)
 	shift_f = shift_f or require("coop.table-utils").shift_left
 	return function(...)
-		return f(unpack(shift_f({ ... })))
+		local pack = require("coop.table-utils").pack
+		local unpack = require("coop.table-utils").unpack_packed
+		local args = pack(...)
+		return f(unpack(shift_f(args, args.n)))
 	end
 end
 

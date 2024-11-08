@@ -9,7 +9,7 @@ describe("coop.functional_utils", function()
 			end
 			local shifted_f = functional_utils.shift_parameters(f)
 
-			assert.are.same({ 1, 2, "cb" }, { shifted_f("cb", 1, 2) })
+			assert.are.same({ 1, nil, "cb" }, { shifted_f("cb", 1, nil) })
 		end)
 	end)
 end)
