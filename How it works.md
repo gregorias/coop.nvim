@@ -59,7 +59,8 @@ features.
 
 A Coop task is an extension of a Lua thread (coroutine) with a `Future` that
 enables holding and waiting for results. It comes with familiar functions that
-work just like for native coroutines except they operate on tasks and task functions:
+work just like for native coroutines except that they operate on tasks and task
+functions:
 
 - `task.create`
 - `task.running`
