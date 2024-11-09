@@ -47,7 +47,7 @@ and it also exists in Coop as
 Lua coroutines are already convenient and powerful, but Coop wanted to provide
 additional functionalities expected from a concurrency framework:
 
-- Cancellation — The programmer should be able to do things like timeout
+- Cancellation — The programmer should be able to do things like timing out
   long-running operations.
 - Awaiting — The programmer should be able to implement non-trivial await
   strategies, e.g., wait for the first operation of many to complete.
