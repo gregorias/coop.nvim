@@ -105,7 +105,32 @@ The callback resumes the awaiting thread.
 
 ### Cancellation
 
-TODO: Explain cancellation.
+Tasks come with a cancel method `task.cancel` that cancels a running task.
+`task.cancel` resumes the tasks and causes `error("cancelled")` to be thrown
+inside the body.
+This is achieved by having a `cancelled` inside the task table and checking for
+it inside `task.yield`:
+
+```lua
+task.yield = function(...)
+  coroutine.yield()
+  -- After resume.
+  this = task.running()
+  if this.cancelled then
+    -- Clear the cancelled flag, so that the user can implement ignoring.
+    task.cancelled = false
+    error("cancelled")
+  end
+  -- …
+end
+```
+
+This will cause the task to effectively stop and become dead, and everyone that
+awaits the task will also get the error.
+
+#### Cancellation cleanup
+
+TODO: Explain the need for cleanup.
 
 ### Error-handling
 
