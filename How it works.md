@@ -105,11 +105,11 @@ The callback resumes the awaiting thread.
 
 ### Cancellation
 
-Tasks come with a cancel method `task.cancel` that cancels a running task.
+Tasks come with a cancel method, `task.cancel`, that cancels a running task.
 `task.cancel` resumes the tasks and causes `error("cancelled")` to be thrown
-inside the body.
-This is achieved by having a `cancelled` inside the task table and checking for
-it inside `task.yield`:
+inside the task’s body.
+This is achieved by having a `cancelled` flag inside the task table and
+checking for the flag inside `task.yield`:
 
 ```lua
 task.yield = function(...)
