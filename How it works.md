@@ -5,36 +5,109 @@ internals.
 
 ## Using callbacks to build coroutines
 
-The first hurdle Coop solves is providing non-blocking operations with a
-convenient coroutine syntax. As so happens, Neovim already provides
-non-blocking operations through the use of callbacks:
+The first feature Coop provides are non-blocking operations with
+[a convenient coroutine syntax](https://gregorias.github.io/posts/using-coroutines-in-neovim-lua/).
+Coop does that by reuse callback-based, non-blocking operations that Neovim
+already provides.
+To understand Coop’s mechanism, let’s first draw how callback-based function
+provide concurrency:
 
 ![A sequence diagram of non-blocking I/O with callbacks](/assets/Nonblocking%20IO%20with%20callbacks.png)
 
 Conceptually, there’s some I/O thread (e.g., a Libuv event loop) that works
 parallel to the main thread.
 When we start a non-blocking operation, we only schedule that operation on the
-I/O thread.
-The I/O thread yields to the main thread and once the scheduled operation is
-ready, calls the callback.
-It works, but results in hard to manage code.
+I/O thread (the `fs_read_cb` call).
+The I/O thread yields to the main thread (`yield`). Once the scheduled
+operation is ready, the I/O thread calls the callback that was provided in
+`fs_read_cb` (`cb()`).
 
-We can turn any such non-blocking function into a coroutine like so:
+We can turn any non-blocking function into a coroutine like so:
 
 ![A sequence diagram of non-blocking I/O with a coroutine](/assets/Nonblocking%20IO%20with%20coroutines.png)
 
 What happens here is:
 
-1. The coroutine yields as soon as the non-blocking operation yields as well.
-2. The callback provided to the I/O thread only resumes the coroutine with the
-   results.
+1. The coroutine wraps the `fs_read_cb` call and yields as soon as the
+   `fs_read_cb` yields.
+2. The coroutine uses a callback that makes the I/O thread resumes the
+   coroutine. The actual result processing happens within the body of the
+   coroutine.
 
-This neaty callback-to-coroutine wrapper keeps the non-blocking property.
-Coroutines’ multi-entry operation makes it all seem sequential.
+This neat callback-to-coroutine wrapping keeps the non-blocking property, while
+coroutine syntax makes it all seem sequential.
 
 Luckily for us, conversion from callbacks to coroutines can be written
 as a generic function. I’ve provided a recipe for it in [my blog post](https://gregorias.github.io/posts/using-coroutines-in-neovim-lua/)
 and it also exists in Coop as `coroutine-utils.cb_to_co`.
+
+## Task abstraction
+
+Lua coroutines are already convenient and powerful, but Coop wanted to provide
+additional functionalities expected from a concurrency framework:
+
+- Cancellation — The programmer should be able to do things like timeout
+  long-running operations.
+- Awaiting — The programmer should be able to implement non-trivial await
+  strategies, e.g., wait for the first operation of many to complete.
+- Error-handling — The programmer should be able to throw and catch errors in
+  coroutines.
+
+Coop’s tasks are the abstraction that extends `coroutines` with aforementioned
+features.
+
+A Coop task is an extension of a Lua thread (coroutine) with a `Future` that
+enables holding and waiting for results. It comes with familiar functions that
+work just like for native coroutines except they operate on tasks and task functions:
+
+- `task.create`
+- `task.running`
+- `task.resume`
+- `task.yield`
+- `task.status`
+
+### Awaiting
+
+To implement result holding and awaiting, Lua tasks hold
+a [`Future`](https://github.com/gregorias/coop.nvim/blob/main/lua/coop/future.lua).
+
+Whenever a new task is created through `task.create`, the task function’s
+result is wired to complete the bundled future:
+
+```lua
+task.create = function(tf)
+  -- …
+  thread = coroutine.create(function(...)
+    future:complete(tf(...))
+  end)
+  -- …
+end
+```
+
+The future itself is a queue a callbacks to be called whenever its completed.
+In Coop, a thread that ends resumes threads that wait on it.
+
+```lua
+Future.complete = function(self, ...)
+  -- …
+  self.results = pack(...)
+  -- …
+  for _, cb in ipairs(self.queue) do
+    cb(unpack(self.results, 1, self.results.n))
+  end
+end
+```
+
+Awaiting is essentially implemented as adding a callback to a future’s queue.
+The callback resumes the awaiting thread.
+
+### Cancellation
+
+TODO: Explain cancellation.
+
+### Error-handling
+
+TODO: Explain the extension to `task.resume`.
 
 ## copcall
 
