@@ -7,10 +7,10 @@ internals.
 
 The first feature Coop provides are non-blocking operations with
 [a convenient coroutine syntax](https://gregorias.github.io/posts/using-coroutines-in-neovim-lua/).
-Coop does that by reuse callback-based, non-blocking operations that Neovim
+Coop does that by reusing callback-based, non-blocking operations that Neovim
 already provides.
-To understand Coop’s mechanism, let’s first draw how callback-based function
-provide concurrency:
+To understand Coop’s mechanism, let’s first draw how a callback-based function
+provides concurrency:
 
 ![A sequence diagram of non-blocking I/O with callbacks](/assets/Nonblocking%20IO%20with%20callbacks.png)
 
@@ -30,7 +30,7 @@ What happens here is:
 
 1. The coroutine wraps the `fs_read_cb` call and yields as soon as the
    `fs_read_cb` yields.
-2. The coroutine uses a callback that makes the I/O thread resumes the
+2. The coroutine uses a callback that makes the I/O thread resume the
    coroutine. The actual result processing happens within the body of the
    coroutine.
 
@@ -38,8 +38,9 @@ This neat callback-to-coroutine wrapping keeps the non-blocking property, while
 coroutine syntax makes it all seem sequential.
 
 Luckily for us, conversion from callbacks to coroutines can be written
-as a generic function. I’ve provided a recipe for it in [my blog post](https://gregorias.github.io/posts/using-coroutines-in-neovim-lua/)
-and it also exists in Coop as `coroutine-utils.cb_to_co`.
+as a generic function. I’ve provided a recipe for it in [my blog post](https://gregorias.github.io/posts/using-coroutines-in-neovim-lua/),
+and it also exists in Coop as
+[`coroutine-utils.cb_to_co`](https://github.com/gregorias/coop.nvim/blob/e7a0793163141e95a7034381cf392df988fc779f/lua/coop/coroutine-utils.lua#L20).
 
 ## Task abstraction
 
