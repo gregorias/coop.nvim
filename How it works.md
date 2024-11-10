@@ -7,8 +7,8 @@ internals.
 
 The first feature Coop provides are non-blocking operations with
 [a convenient coroutine syntax](https://gregorias.github.io/posts/using-coroutines-in-neovim-lua/).
-Coop does that by reusing callback-based, non-blocking operations that Neovim
-already provides.
+Coop does that by reusing callback-based, non-blocking operations from Neovim’s
+standard library.
 To understand Coop’s mechanism, let’s first draw how a callback-based function
 provides concurrency:
 
@@ -18,9 +18,9 @@ Conceptually, there’s some I/O thread (e.g., a Libuv event loop) that works
 parallel to the main thread.
 When we start a non-blocking operation, we only schedule that operation on the
 I/O thread (the `fs_read_cb` call).
-The I/O thread yields to the main thread (`yield`). Once the scheduled
-operation is ready, the I/O thread calls the callback that was provided in
-`fs_read_cb` (`cb()`).
+The I/O thread eventually yields to the main thread (`yield`).
+Once the scheduled operation is ready, the I/O thread calls the callback that
+was provided in `fs_read_cb` (`cb()`).
 
 We can turn any non-blocking function into a coroutine like so:
 
@@ -35,7 +35,7 @@ What happens here is:
    coroutine.
 
 This neat callback-to-coroutine wrapping keeps the non-blocking property, while
-coroutine syntax makes it all seem sequential.
+coroutine syntax makes it all look sequential syntactically.
 
 Luckily for us, conversion from callbacks to coroutines can be written
 as a generic function. I’ve provided a recipe for it in [my blog post](https://gregorias.github.io/posts/using-coroutines-in-neovim-lua/),
@@ -78,16 +78,18 @@ result is wired to complete the bundled future:
 
 ```lua
 task.create = function(tf)
+  local new_task
   -- …
-  thread = coroutine.create(function(...)
-    future:complete(tf(...))
+  new_task.thread = coroutine.create(function(...)
+    new_task.future:complete(tf(...))
   end)
   -- …
 end
 ```
 
-The future itself is a queue a callbacks to be called whenever its completed.
-In Coop, a thread that ends resumes threads that wait on it.
+The future itself is a queue of callbacks to be called whenever its completed.
+
+In Coop, a thread that ends, resumes threads that wait on it.
 
 ```lua
 Future.complete = function(self, ...)
@@ -106,7 +108,7 @@ The callback resumes the awaiting thread.
 ### Cancellation
 
 Tasks come with a cancel method, `task.cancel`, that cancels a running task.
-`task.cancel` resumes the tasks and causes `error("cancelled")` to be thrown
+`task.cancel` resumes the task and causes `error("cancelled")` to be thrown
 inside the task’s body.
 This is achieved by having a `cancelled` flag inside the task table and
 checking for the flag inside `task.yield`:
