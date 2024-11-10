@@ -45,6 +45,44 @@ describe("coop.uv", function()
 		end)
 	end)
 
+	describe("spawn", function()
+		it("executes the snippet from Neovim’s docs", function()
+			-- The snippet:
+			-- https://neovim.io/doc/user/luvref.html#uv.spawn():~:text=local%20stdin%20%3D%20uv.new_pipe,end)%0Aend)
+			--
+			-- This test uses the task API to avoid callbacks.
+			local stdin = vim.uv.new_pipe()
+			local stdout = vim.uv.new_pipe()
+			local stderr = vim.uv.new_pipe()
+
+			local handle, pid, cat_future = uv.spawn("cat", {
+				stdio = { stdin, stdout, stderr },
+			})
+			assert.is.True(handle ~= nil and pid ~= nil)
+
+			local read_future = coop.Future.new()
+			vim.uv.read_start(stdout, function(err, data)
+				assert(not err, err)
+				if data ~= nil and not read_future.done then
+					read_future:complete(data)
+				end
+			end)
+			vim.uv.write(stdin, "Hello World")
+
+			-- We now need to execute in a task to avoid using callbacks and test the API.
+			local exit_code, exit_signal = coop.spawn(function()
+				local read_data = read_future:await()
+				assert.are.same("Hello World", read_data)
+				local err_stdin_shutdown = uv.shutdown(stdin)
+				assert.is.Nil(err_stdin_shutdown)
+				return cat_future:await()
+			end):await(200, 2)
+
+			assert.are.same(0, exit_code)
+			assert.are.same(0, exit_signal)
+		end)
+	end)
+
 	describe("fs_read", function()
 		it("reads README", function()
 			local header = coop.spawn(function()

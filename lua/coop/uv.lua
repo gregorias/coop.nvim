@@ -42,6 +42,12 @@ local wrap = function(f, cb2tf_opts, cb_pos)
 	return coop.cb_to_tf(schedule_cb(f, cb_pos), cb2tf_opts)
 end
 
+--- https://neovim.io/doc/user/luvref.html#uv.close()
+---
+---@async
+---@param handle uv_handle_t
+M.close = wrap(vim.uv.close)
+
 M.timer_start = wrap(vim.uv.timer_start)
 
 --- Sleeps for a number of milliseconds.
@@ -57,6 +63,40 @@ M.sleep = function(ms)
 	if not success then
 		error(err, 0)
 	end
+end
+
+--- Spawns a new process.
+---
+---@param path string The path to the executable.
+---@param options table
+---@return uv_process_t handle
+---@return integer pid
+---@return Future future The future for the exit code and signal.
+M.spawn = function(path, options)
+	local future = coop.Future.new()
+	local handle, pid = vim.uv.spawn(path, options, function(code, signal)
+		future:complete(code, signal)
+	end)
+	return handle, pid, future
+end
+
+--- https://neovim.io/doc/user/luvref.html#uv.shutdown()
+---
+---@async
+---@param stream uv_stream_t
+---@return string? err
+---@return uv_shutdown_t?
+M.shutdown = function(stream)
+	local shutdown_cb = function(stream_, cb)
+		local uv_shutdown, err = vim.uv.shutdown(stream_, function(...)
+			cb(...)
+		end)
+		if uv_shutdown == nil then
+			-- TODO: Test this case.
+			cb(err, nil)
+		end
+	end
+	wrap(shutdown_cb)(stream)
 end
 
 --- TODO: Not implementing stream functions for now.
