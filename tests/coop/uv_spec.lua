@@ -44,4 +44,20 @@ describe("coop.uv", function()
 			assert.is.False(done)
 		end)
 	end)
+
+	describe("fs_read", function()
+		it("reads README", function()
+			local header = coop.spawn(function()
+				local err_open, fd = uv.fs_open("README.md", "r", 0)
+				assert.is.Nil(err_open)
+				local err_read, data = uv.fs_read(fd, 4)
+				assert.is.Nil(err_read)
+				uv.fs_close(fd)
+				return data
+			end):await(100, 2)
+
+			-- The readme starts with an HTML comment.
+			assert.are.same("<!--", header)
+		end)
+	end)
 end)
