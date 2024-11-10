@@ -132,11 +132,62 @@ awaits the task will also get the error.
 
 #### Cancellation cleanup
 
-TODO: Explain the need for cleanup.
+The cancellation feature complicates cleanup.
+In [Using callbacks to build coroutines](#using-callbacks-to-build-coroutines),
+I explained how the I/O thread resumes a suspended coroutines,
+but now `task.cancel` becomes an alternative way to resume the task.
+If that happens, we need to stop any started background threads or clean up
+after them if they finish.
+
+Coop provides an upgraded
+[`task-utils.cb_to_tf`](https://github.com/gregorias/coop.nvim/blob/ed8ceabc0b97ff77495112a2dc4f89cf7b0aa97e/lua/coop/task-utils.lua#L34)
+that accepts callbacks for cleanup.
+These callbacks are used in Libuv wrappers to, for example, deallocate file
+descriptors upon cancellation:
+
+```lua
+M.fs_open = cb_to_tf(vim.uv.fs_open, {
+  cleanup = function(err, fd)
+    if not err then
+      vim.uv.fs_close(fd)
+    end
+  end,
+})
+```
 
 ### Error-handling
 
-TODO: Explain the extension to `task.resume`.
+The last task feature is the ability to catch errors.
+`task.create` doesn’t have any facilities for that as it only captures the
+return value of the task function:
+
+```lua
+task.create = function(tf)
+  -- …
+  new_task.thread = coroutine.create(function(...)
+    new_task.future:complete(tf(...))
+  end)
+  -- …
+end
+```
+
+Coop captures error by extending `coroutine.resume` in `task.resume`.
+`coroutine.resume` behaves like `pcall` in that it turns thrown errors into
+return values, so `task.resume` just watches for that:
+
+```lua
+task.resume = function(t, ...)
+  -- …
+  local results = pack(coroutine.resume(t.thread, ...))
+  -- …
+  if not results[1] then
+    t.future:error(results[2])
+  end
+  -- …
+end
+```
+
+`Future.error` is a counterpart to `Future.complete` for saving errors.
 
 ## copcall
 
