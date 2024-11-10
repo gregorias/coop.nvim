@@ -201,6 +201,7 @@ The SVG from the logo comes from
 - [Coerce](https://github.com/gregorias/coerce.nvim) — My Neovim plugin for case conversion.
 - [Toggle](https://github.com/gregorias/toggle.nvim) — My Neovim plugin for toggling options.
 - [Coop’s design was presented as an approach structured concurrency in Neovim.](https://github.com/neovim/neovim/issues/19624#issuecomment-2466700118)
+- [Reddit thread](https://www.reddit.com/r/neovim/comments/1gnz7tl/beta_coopnvim_a_structured_concurrency_plugin_for/)
 
 [Lazy]: https://github.com/folke/lazy.nvim
 [Nio]: https://github.com/nvim-neotest/nvim-nio
