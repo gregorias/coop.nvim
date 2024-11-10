@@ -13,7 +13,8 @@
 Coop is a Neovim plugin that provides an asynchronous **op**eration framework
 based on native Lua **co**routines.
 If you write Lua code in Neovim, Coop lets you write non-blocking code that
-looks synchronous like async/await in other languages.
+looks synchronous.
+It’s like async/await in some other languages.
 
 Coop was designed to
 
