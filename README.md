@@ -29,6 +29,16 @@ Here’s what else you can expect from Coop:
   function. If the callback-based function is non-blocking, so will the task
   function be.
 
+> [!WARNING]
+> Coop.nvim is right now in a preview release.
+>
+> - The interfaces should be mostly stable.
+> - Some ports of standard library functions are missing.
+> - Additional control function are missing.
+>
+> I want to see if there’s any initial reception before I commit fully to
+> implementing all batteries.
+
 ## ⚡️ Requirements
 
 - Neovim 0.10+
@@ -85,10 +95,16 @@ A task behaves like a coroutine and comes with its own equivalent functions that
 ```lua
 task.create
 task.resume
+
+--- Yield throws `error("cancelled")` if in a cancelled task.
 task.yield
+
 task.status
 task.running
 ```
+
+There’s also `pyield` variant of `yield` that returns `success, results`
+instead of throwing an error.
 
 `task.create` accepts **task functions**, which is a function that may call `task.yield`.
 
@@ -105,7 +121,7 @@ function task.cancel(task)
 end
 ```
 
-An await method that has three variants:
+And an await method that has three variants:
 
 ```lua
 -- Awaits task completion.
@@ -170,6 +186,9 @@ As far as I can tell, **Nio doesn’t let you safely unload resources upon cance
 [it just makes the task dead](https://github.com/nvim-neotest/nvim-nio/blob/a428f309119086dc78dd4b19306d2d67be884eee/lua/nio/tasks.lua#L113-L116).
 
 ### Plenary Async
+
+Plenary async is effectively broken as
+[it doesn’t support nesting](https://github.com/nvim-lua/plenary.nvim/issues/395).
 
 ## 🙏 Acknowledgments
 
