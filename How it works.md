@@ -89,7 +89,7 @@ end
 
 The future itself is a queue of callbacks to be called whenever its completed.
 
-In Coop, a thread that ends, resumes threads that wait on it.
+In Coop, a task that ends resumes waiting tasks:
 
 ```lua
 Future.complete = function(self, ...)
@@ -103,7 +103,7 @@ end
 ```
 
 Awaiting is essentially implemented as adding a callback to a future’s queue.
-The callback resumes the awaiting thread.
+The callback resumes the awaiting tasks.
 
 ### Cancellation
 

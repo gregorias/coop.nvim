@@ -17,16 +17,17 @@ looks synchronous like async/await in other languages.
 
 Coop was designed to
 
-- Be simple. [It should be easy to explain.](How%20it%20works.md)
-- Stay close to native Lua coroutines and Lua’s idioms. Coop interface feels
-  like a synchronous interface would and minimizes surprizes.
+- Be simple. [Coop should be easy to explain.](How%20it%20works.md)
+- Stay close to native Lua coroutines and Lua’s idioms.
 - Come with batteries included for Neovim.
 
 Here’s what else you can expect from Coop:
 
 - True parallelism with a rich set of control operators.
 - A flexible cancellation mechanism.
-- Extensibility — Turn any callback-based function into a task function.
+- Extensibility — You can turn any callback-based function into a task
+  function. If the callback-based function is non-blocking, so will the task
+  function be.
 
 ## ⚡️ Requirements
 
@@ -46,7 +47,7 @@ Install the plugin with your preferred package manager, such as [Lazy]:
 
 ### Examples tutorial
 
-A good introduction to Coop or any framework is to look at code examples.
+A good introduction to Coop is to look at code examples.
 Check out [`lua/coop/examples.lua`](/lua/coop/examples.lua):
 
 [`search_for_readme`](https://github.com/gregorias/coop.nvim/blob/0e2082500707f2a143ff924ad36577c348148517/lua/coop/examples.lua#L40)
