@@ -1,4 +1,6 @@
 --- This module provides task function versions of vim.uv functions.
+---
+--- Official reference: https://neovim.io/doc/user/luvref.html.
 local M = {}
 
 local coop = require("coop")
@@ -38,6 +40,11 @@ end
 local wrap = function(f, cb2tf_opts, cb_pos)
 	return coop.cb_to_tf(schedule_cb(f, cb_pos), cb2tf_opts)
 end
+
+--- https://neovim.io/doc/user/luvref.html#uv.poll_start()
+--- Don’t import, because the callback is not a continuation.
+
+-- TODO: https://neovim.io/doc/user/luvref.html#uv.shutdown()
 
 M.timer_start = wrap(vim.uv.timer_start)
 M.fs_open = wrap(vim.uv.fs_open, {
