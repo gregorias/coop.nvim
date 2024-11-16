@@ -155,7 +155,8 @@ The essential task-related functions live in `coop.task` and `coop.task-utils` m
 
 #### `coop.mpsc-queue`
 
-`mpsc-queue` module provides a multiple-producer single-consumer concurrent
+[The `mpsc-queue` module](https://github.com/gregorias/coop.nvim/blob/main/lua/coop/mpsc-queue.lua)
+provides a multiple-producer single-consumer concurrent
 queue with an asynchronous `pop` method.
 
 <details>
@@ -188,6 +189,12 @@ end)
 ```
 
 </details>
+
+#### `coop.uv`
+
+[The `uv` module](https://github.com/gregorias/coop.nvim/blob/main/lua/coop/uv.lua)
+provides task function versions of asynchronous functions in
+[`vim.uv`][Neovim UV].
 
 ### FAQ
 
@@ -243,3 +250,4 @@ The SVG from the logo comes from
 
 [Lazy]: https://github.com/folke/lazy.nvim
 [Nio]: https://github.com/nvim-neotest/nvim-nio
+[Neovim UV]: https://neovim.io/doc/user/luvref.html
