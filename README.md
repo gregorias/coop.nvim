@@ -151,6 +151,44 @@ local result = get_result_1()
 
 The essential task-related functions live in `coop.task` and `coop.task-utils` modules.
 
+### Library reference
+
+#### `coop.mpsc-queue`
+
+`mpsc-queue` module provides a multiple-producer single-consumer concurrent
+queue with an asynchronous `pop` method.
+
+<details>
+
+<summary>Code example</summary>
+
+```lua
+local MpscQueue = require('coop.mpsc_queue').MpscQueue
+local q = MpscQueue.new()
+
+-- Asynchronously print whatever is provided to q.
+coop.spawn(function()
+  while true do
+    vim.print("Read: " .. q:pop())
+  end
+end)
+
+-- Start two threads that will asynchronously get strings from two sources.
+coop.spawn(function()
+  while true do
+    q:push(read_string_from_user())
+  end
+end)
+
+coop.spawn(function()
+  while true do
+    q:push(read_string_from_something_else())
+  end
+end)
+```
+
+</details>
+
 ### FAQ
 
 #### How do I block until an asynchronous function is done in synchronous code?
