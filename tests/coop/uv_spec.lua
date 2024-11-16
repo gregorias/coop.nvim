@@ -83,6 +83,67 @@ describe("coop.uv", function()
 		end)
 	end)
 
+	describe("write", function()
+		it("returns a fail on a non-writable pipe", function()
+			local p = vim.uv.new_pipe()
+
+			local err = coop.spawn(function()
+				return uv.write(p, "foo")
+			end):await(100, 1)
+
+			assert.are.same("EBADF: bad file descriptor", err)
+		end)
+
+		it("cancellation works", function()
+			local fds = vim.uv.pipe({ nonblock = true }, { nonblock = true })
+			local read_pipe = vim.uv.new_pipe()
+			read_pipe:open(fds.read)
+			local write_pipe = vim.uv.new_pipe()
+			write_pipe:open(fds.write)
+
+			coop.spawn(function()
+				return uv.write(write_pipe, "foo")
+			end):cancel()
+
+			if not vim.uv.is_closing(write_pipe) then
+				vim.uv.close(write_pipe)
+			end
+			vim.uv.close(read_pipe)
+		end)
+
+		it("writes to a pipe", function()
+			local fds = vim.uv.pipe({ nonblock = true }, { nonblock = true })
+			local read_pipe = vim.uv.new_pipe()
+			read_pipe:open(fds.read)
+			local write_pipe = vim.uv.new_pipe()
+			write_pipe:open(fds.write)
+
+			local read_future = coop.Future.new()
+
+			read_pipe:read_start(function(err, data)
+				if read_future.done then
+					error("This should not happen.")
+				end
+				if err then
+					read_future:error(err)
+				else
+					read_future:complete(data)
+				end
+			end)
+
+			local result = coop.spawn(function()
+				local err = uv.write(write_pipe, "foo")
+				assert(err == nil)
+				return read_future:await()
+			end):await(100, 1)
+
+			vim.uv.close(write_pipe)
+			vim.uv.close(read_pipe)
+
+			assert.are.same("foo", result)
+		end)
+	end)
+
 	describe("fs_read", function()
 		it("reads README", function()
 			local header = coop.spawn(function()

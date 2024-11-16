@@ -7,7 +7,11 @@ local M = {}
 local coop = require("coop")
 local copcall = require("coop").copcall
 
--- Types seen in the official reference: https://neovim.io/doc/user/luvref.html#luv-contents.
+-- Types seen in the official reference.
+
+---@alias buffer string|string[]
+
+-- https://neovim.io/doc/user/luvref.html#luv-contents
 
 ---@alias uv_handle_t uv_timer_t|uv_prepare_t|uv_check_t|uv_idle_t|uv_async_t|uv_poll_t|uv_signal_t|uv_process_t|uv_stream_t|uv_udp_t|uv_fs_event_t|uv_fs_pool_t
 ---@alias uv_timer_t userdata
@@ -125,9 +129,35 @@ M.shutdown = function(stream)
 	wrap(shutdown_cb)(stream)
 end
 
+--- https://neovim.io/doc/user/luvref.html#uv.write()
+---
+---@async
+---@param stream uv_stream_t
+---@param data buffer
+---@return string? err
+M.write = function(stream, data)
+	local write_cb = function(cb, stream_, data_)
+		local handle, err = vim.uv.write(stream_, data_, function(err_)
+			-- vim.uv functions require a rescheduled callback to run `vim.api` functions.
+			vim.schedule_wrap(cb)(err_)
+		end)
+		if handle == nil then
+			-- Immediately call the callback to handle the error, so that
+			-- the cancellation mechanism below never triggers.
+			cb(err)
+		else
+			return handle
+		end
+	end
+	return coop.cb_to_tf(write_cb, {
+		on_cancel = function(_, write_cb_ret)
+			vim.uv.close(write_cb_ret[1])
+		end,
+	})(stream, data)
+end
+
 --- TODO: Not implementing stream functions for now.
 --- I’ll wait for initial feedback on the framework before spending time here.
---- https://neovim.io/doc/user/luvref.html#uv.shutdown()
 
 --- https://neovim.io/doc/user/luvref.html#uv.fs_event_start()
 --- https://neovim.io/doc/user/luvref.html#uv.fs_poll_start()
