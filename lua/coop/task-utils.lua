@@ -5,9 +5,11 @@ local pack = require("coop.table-utils").pack
 local task = require("coop.task")
 
 ---@class CbToTfOpts
----@field on_cancel? fun(...) The function to call when the task is cancelled.
----                           This can be used to stop allocation of resources.
----                           This function receives the original call’s arguments.
+---@field on_cancel? fun(table, table) The function to call when the task is cancelled.
+---                                    This can be used to stop allocation of resources.
+---                                    This function receives packed tables with the original call’s arguments and
+---                                    the immediately returned values (useful if the function returns a cancellable
+---                                    handle).
 ---@field cleanup? fun(...) The function to call when the task has been cancelled but the callback gets called.
 ---                         This can be used to clean up allocated resources.
 ---                         This function receives the callback arguments.
@@ -39,9 +41,9 @@ M.cb_to_tf = function(f, opts)
 		assert(this ~= nil, "The result of cb_to_tf must be called within a task.")
 
 		local f_status = "running"
-		local f_ret = pack()
+		local f_cb_ret = pack()
 		-- f needs to have the callback as its first argument, because varargs passing doesn’t work otherwise.
-		f(function(...)
+		local f_ret = pack(f(function(...)
 			if f_status == "cancelled" then
 				-- The task has been cancelled before this callback. Just run the cleanup function to cleanup
 				-- any allocated resources.
@@ -50,25 +52,25 @@ M.cb_to_tf = function(f, opts)
 			end
 
 			f_status = "done"
-			f_ret = pack(...)
+			f_cb_ret = pack(...)
 			if task.status(this) == "suspended" then
 				-- If we are suspended, then f_tf has yielded control after calling f.
 				-- Use the caller of this callback to resume computation until the next yield.
 				task.resume(this)
 			end
-		end, ...)
+		end, ...))
 		if f_status == "running" then
 			-- If we are here, then `f` must not have called the callback yet, so it will do so asynchronously.
 			-- Yield control and wait for the callback to resume it.
 			local not_cancelled, err_msg = task.pyield()
 			if not not_cancelled then
 				f_status = "cancelled"
-				opts.on_cancel(...)
+				opts.on_cancel(pack(...), f_ret)
 				error(err_msg, 0)
 			end
 		end
 
-		return unpack(f_ret, 1, f_ret.n)
+		return unpack(f_cb_ret, 1, f_cb_ret.n)
 	end
 
 	return f_tf

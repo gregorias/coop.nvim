@@ -120,6 +120,23 @@ describe("coop.task-utils", function()
 			assert.is.True(on_cancel_called)
 			assert.is.True(cleanup_called)
 		end)
+
+		it("cancels with a returned handle in on_cancel", function()
+			local handle = {}
+			-- `f` returns a handle to an ongoing op that `on_cancel` should “cancel.”
+			local tf = cb_to_tf(function(_)
+				handle = { status = "running" }
+				return handle
+			end, {
+				on_cancel = function(_, f_ret)
+					f_ret[1].status = "cancelled"
+				end,
+			})
+
+			coop.spawn(tf):cancel()
+
+			assert.are.same("cancelled", handle.status)
+		end)
 	end)
 
 	describe("spawn", function()
