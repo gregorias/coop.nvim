@@ -7,6 +7,25 @@ local M = {}
 local coop = require("coop")
 local copcall = require("coop").copcall
 
+-- Types seen in the official reference: https://neovim.io/doc/user/luvref.html#luv-contents.
+
+---@alias uv_handle_t uv_timer_t|uv_prepare_t|uv_check_t|uv_idle_t|uv_async_t|uv_poll_t|uv_signal_t|uv_process_t|uv_stream_t|uv_udp_t|uv_fs_event_t|uv_fs_pool_t
+---@alias uv_timer_t userdata
+---@alias uv_prepare_t userdata
+---@alias uv_check_t userdata
+---@alias uv_idle_t userdata
+---@alias uv_async_t userdata
+---@alias uv_poll_t userdata
+---@alias uv_signal_t userdata
+---@alias uv_process_t userdata
+---@alias uv_stream_t uv_tcp_t|uv_pipe_t|uv_tty_t|userdata
+---@alias uv_tcp_t userdata
+---@alias uv_pipe_t userdata
+---@alias uv_tty_t userdata
+---@alias uv_udp_t userdata
+---@alias uv_fs_event_t userdata
+---@alias uv_fs_pool_t userdata
+
 --- Wraps the callback param with `vim.schedule_wrap`.
 ---
 --- This is useful for Libuv functions to ensure that their continuations can run `vim.api` functions without problems.
@@ -48,6 +67,13 @@ end
 ---@param handle uv_handle_t
 M.close = wrap(vim.uv.close)
 
+--- https://neovim.io/doc/user/luvref.html#uv.timer_start()
+---
+---@async
+---@param timer uv_timer_t
+---@param timeout integer
+---@param repeat integer
+---@return integer? zero_or_fail
 M.timer_start = wrap(vim.uv.timer_start)
 
 --- Sleeps for a number of milliseconds.
