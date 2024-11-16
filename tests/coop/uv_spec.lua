@@ -97,7 +97,7 @@ describe("coop.uv", function()
 
 		it("shuts down a pipe", function()
 			local stdin = vim.uv.new_pipe()
-			local handle, _, cat_future = uv.spawn("cat", {
+			local handle, _, _ = uv.spawn("cat", {
 				stdio = { stdin },
 			})
 			assert(handle ~= nil)
