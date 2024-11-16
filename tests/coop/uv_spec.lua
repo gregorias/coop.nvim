@@ -74,12 +74,45 @@ describe("coop.uv", function()
 				local read_data = read_future:await()
 				assert.are.same("Hello World", read_data)
 				local err_stdin_shutdown = uv.shutdown(stdin)
-				assert.is.Nil(err_stdin_shutdown)
+				assert(err_stdin_shutdown == nil)
 				return cat_future:await()
 			end):await(200, 2)
 
 			assert.are.same(0, exit_code)
 			assert.are.same(0, exit_signal)
+		end)
+	end)
+
+	describe("shutdown", function()
+		it("returns a fail on a non-writable pipe", function()
+			local p = vim.uv.new_pipe()
+
+			local err, name = coop.spawn(function()
+				return uv.shutdown(p)
+			end):await(100, 1)
+
+			assert.are.same("ENOTCONN: socket is not connected", err)
+			assert.are.same("ENOTCONN", name)
+		end)
+
+		it("shuts down a pipe", function()
+			local stdin = vim.uv.new_pipe()
+			local handle, _, cat_future = uv.spawn("cat", {
+				stdio = { stdin },
+			})
+			assert(handle ~= nil)
+
+			local _, err_name_write = coop.spawn(function()
+				local err_shutdown = uv.shutdown(stdin)
+				assert(err_shutdown == nil, err_shutdown)
+				return uv.write(stdin, "foo")
+			end):await(100, 1)
+
+			vim.uv.close(stdin)
+			vim.uv.close(handle)
+
+			-- The pipe is shut down, so we should get an EPIPE error.
+			assert.are.same("EPIPE", err_name_write)
 		end)
 	end)
 

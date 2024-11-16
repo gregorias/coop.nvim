@@ -11,8 +11,9 @@ local copcall = require("coop").copcall
 
 ---@alias buffer string|string[]
 
----@alias uv_req_t uv_fs_t
+---@alias uv_req_t uv_fs_t|uv_shutdown_t
 ---@class uv_fs_t
+---@class uv_shutdown_t
 
 -- https://neovim.io/doc/user/luvref.html#luv-contents
 
@@ -118,18 +119,23 @@ end
 ---@async
 ---@param stream uv_stream_t
 ---@return string? err
----@return uv_shutdown_t?
+---@return string? err_name
 M.shutdown = function(stream)
-	local shutdown_cb = function(stream_, cb)
-		local uv_shutdown, err = vim.uv.shutdown(stream_, function(...)
-			cb(...)
+	local shutdown_cb = function(cb, stream_)
+		local uv_shutdown, err, name = vim.uv.shutdown(stream_, function(err_)
+			cb(err_)
 		end)
 		if uv_shutdown == nil then
-			-- TODO: Test this case.
-			cb(err, nil)
+			cb(err, name)
 		end
+		return uv_shutdown, err, name
 	end
-	wrap(shutdown_cb)(stream)
+
+	return coop.cb_to_tf(shutdown_cb, {
+		on_cancel = function(_, write_cb_ret)
+			vim.uv.cancel(write_cb_ret[1])
+		end,
+	})(stream)
 end
 
 --- https://neovim.io/doc/user/luvref.html#uv.write()
@@ -138,16 +144,17 @@ end
 ---@param stream uv_stream_t
 ---@param data buffer
 ---@return string? err
+---@return string? err_name
 M.write = function(stream, data)
 	local write_cb = function(cb, stream_, data_)
-		local handle, err = vim.uv.write(stream_, data_, function(err_)
+		local handle, err, err_name = vim.uv.write(stream_, data_, function(err_)
 			-- vim.uv functions require a rescheduled callback to run `vim.api` functions.
 			vim.schedule_wrap(cb)(err_)
 		end)
 		if handle == nil then
 			-- Immediately call the callback to handle the error, so that
 			-- the cancellation mechanism below never triggers.
-			cb(err)
+			cb(err, err_name)
 		else
 			return handle
 		end
