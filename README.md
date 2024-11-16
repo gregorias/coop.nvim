@@ -82,6 +82,18 @@ with error handling through `copcall`.
 
 This section introduces the essential interfaces.
 
+In Coop, the two main abstractions are **task functions** and **tasks**.
+**Task functions** are regular Lua functions that may call `task.yield`.
+Task functions are effectively asynchronous functions.
+Whenever you see a function in Coop that’s annotated with `@async`, it is a
+task function.
+You may nest task functions freely like you would nest regular functions.
+
+The main caveat for **task functions** is that to run them in your top-level
+synchronous code, you need to wrap them in a **task**, which represents a
+thread.
+You usually do the wrapping with `coop.spawn` (see aforementioned examples).
+
 #### Task
 
 The main abstraction of Coop is a **task**.
@@ -107,7 +119,9 @@ task.running
 There’s also `pyield` variant of `yield` that returns `success, results`
 instead of throwing an error.
 
-`task.create` accepts **task functions**, which is a function that may call `task.yield`.
+`task.create` creates a new thread and accepts **task functions**.
+Instead of `task.create` you should usually use `coop.spawn`, which creates a
+new task and resumes it.
 
 Tasks come with two additional functions. A cancel function (which is also a method):
 
