@@ -11,22 +11,25 @@ local copcall = require("coop").copcall
 
 ---@alias buffer string|string[]
 
+---@alias uv_req_t uv_fs_t
+---@class uv_fs_t
+
 -- https://neovim.io/doc/user/luvref.html#luv-contents
 
 ---@alias uv_handle_t uv_timer_t|uv_prepare_t|uv_check_t|uv_idle_t|uv_async_t|uv_poll_t|uv_signal_t|uv_process_t|uv_stream_t|uv_udp_t|uv_fs_event_t|uv_fs_pool_t
----@alias uv_timer_t userdata
----@alias uv_prepare_t userdata
----@alias uv_check_t userdata
----@alias uv_idle_t userdata
----@alias uv_async_t userdata
----@alias uv_poll_t userdata
----@alias uv_signal_t userdata
----@alias uv_process_t userdata
+---@class uv_timer_t userdata
+---@class uv_prepare_t userdata
+---@class uv_check_t userdata
+---@class uv_idle_t userdata
+---@class uv_async_t userdata
+---@class uv_poll_t userdata
+---@class uv_signal_t userdata
+---@class uv_process_t userdata
 ---@alias uv_stream_t uv_tcp_t|uv_pipe_t|uv_tty_t|userdata
----@alias uv_tcp_t userdata
----@alias uv_pipe_t userdata
----@alias uv_tty_t userdata
----@alias uv_udp_t userdata
+---@class uv_tcp_t userdata
+---@class uv_pipe_t userdata
+---@class uv_tty_t userdata
+---@class uv_udp_t userdata
 ---@alias uv_fs_event_t userdata
 ---@alias uv_fs_pool_t userdata
 
@@ -171,6 +174,7 @@ end
 M.fs_close = wrap(vim.uv.fs_close)
 
 --- https://neovim.io/doc/user/luvref.html#uv.fs_open()
+---
 ---@async
 ---@param path string
 ---@param flags string|integer

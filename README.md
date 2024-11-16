@@ -56,13 +56,46 @@ Install the plugin with your preferred package manager, such as [Lazy]:
 
 ## 🚀 Usage
 
-### Examples tutorial
+### Hello, world
 
-A good introduction to Coop is to look at code examples.
-Check out [`lua/coop/examples.lua`](/lua/coop/examples.lua):
+Let’s start with the hello world of asynchronicity: reading a file.
+Below is an end-to-end code that shows how to concurrently read two files with Coop:
+
+```lua
+local coop = require("coop")
+local uv = require("coop.uv")
+
+--- Reads a file.
+---
+---@async
+---@param path string
+---@return string
+function readFileAsync(path)
+  local err_open, fd = uv.fs_open(path, "r", 438)
+  assert(err_open == nil)
+  local err_fstat, stat = uv.fs_fstat(fd)
+  assert(err_fstat == nil)
+  local err_read, data = uv.fs_read(fd, stat.size, 0)
+  assert(err_read == nil)
+  local err_close = uv.fs_close(fd)
+  assert(err_close == nil)
+  return data
+end
+
+--- Read `foo.txt` and `bar.txt` concurrently.
+local foo_task = coop.spawn(readFileAsync, "foo.txt")
+local bar_task = coop.spawn(readFileAsync, "bar.txt")
+
+--- Wait 1s for both tasks to finish and print their results.
+print(foo_task:await(1000), bar_task:await(1000))
+```
+
+### Advanced examples
+
+For more advanced examples, check out [`lua/coop/examples.lua`](/lua/coop/examples.lua):
 
 [`search_for_readme`](https://github.com/gregorias/coop.nvim/blob/0e2082500707f2a143ff924ad36577c348148517/lua/coop/examples.lua#L40)
-shows a hello world of asynchronicity: filesystem operations.
+shows filesystem operations.
 Although `search_for_readme` is non-blocking, it looks _exactly_
 like its synchronous counterpart would look like.
 One tiny caveat is that you need to spawn it in your main, synchronous thread
