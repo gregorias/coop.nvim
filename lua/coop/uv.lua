@@ -80,9 +80,24 @@ M.close = wrap(vim.uv.close)
 ---@async
 ---@param timer uv_timer_t
 ---@param timeout integer
----@param repeat integer
 ---@return integer? zero_or_fail
-M.timer_start = wrap(vim.uv.timer_start)
+---@return string? err
+---@return string? err_name
+M.timer_start = function(timer, timeout)
+	-- Repeat must always be zero, because Coopification only involves continuations.
+	local timer_start_cb = function(cb, timer_, timeout_)
+		local zero, err, err_name = vim.uv.timer_start(timer_, timeout_, 0, function()
+			vim.schedule_wrap(cb)(0)
+		end)
+
+		if zero == nil then
+			-- I don’t know how to simulate this error case.
+			cb(zero, err, err_name)
+		end
+	end
+
+	return coop.cb_to_tf(timer_start_cb)(timer, timeout)
+end
 
 --- Sleeps for a number of milliseconds.
 ---
@@ -125,7 +140,7 @@ end
 M.shutdown = function(stream)
 	local shutdown_cb = function(cb, stream_)
 		local uv_shutdown, err, name = vim.uv.shutdown(stream_, function(err_)
-			cb(err_)
+			vim.schedule_wrap(cb)(err_)
 		end)
 		if uv_shutdown == nil then
 			cb(err, name)

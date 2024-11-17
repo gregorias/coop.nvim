@@ -3,6 +3,8 @@ local coop = require("coop")
 local uv = require("coop.uv")
 
 describe("coop.uv", function()
+	describe("timer_start", function() end)
+
 	describe("sleep", function()
 		it("sleeps for some time in an asynchronous coroutine", function()
 			local done = false
