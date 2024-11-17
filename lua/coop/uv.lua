@@ -167,9 +167,6 @@ M.write = function(stream, data)
 	})(stream, data)
 end
 
---- TODO: Not implementing stream functions for now.
---- I’ll wait for initial feedback on the framework before spending time here.
-
 --- https://neovim.io/doc/user/luvref.html#uv.fs_event_start()
 --- https://neovim.io/doc/user/luvref.html#uv.fs_poll_start()
 --- Don’t import, because the callback is not a continuation.
@@ -283,6 +280,84 @@ M.fs_lstat = wrap(vim.uv.fs_lstat)
 ---@return boolean? success
 M.fs_rename = wrap(vim.uv.fs_rename)
 
+--- https://neovim.io/doc/user/luvref.html#uv.fs_fsync()
+---
+---@async
+---@param fd integer
+---@return string? err
+---@return boolean? success
+M.fs_fsync = wrap(vim.uv.fs_fsync)
+
+--- https://neovim.io/doc/user/luvref.html#uv.fs_access()
+---
+---@async
+---@param path string
+---@param mode integer
+---@return string? err
+---@return boolean? permission
+M.fs_access = wrap(vim.uv.fs_access)
+
+--- https://neovim.io/doc/user/luvref.html#uv.fs_chmod()
+---
+---@async
+---@param path string
+---@param mode integer
+---@return string? err
+---@return boolean? success
+M.fs_chmod = wrap(vim.uv.fs_chmod)
+
+--- https://neovim.io/doc/user/luvref.html#uv.fs_fchmod()
+---
+---@async
+---@param fd integer
+---@param mode integer
+---@return string? err
+---@return boolean? success
+M.fs_fchmod = wrap(vim.uv.fs_fchmod)
+
+--- https://neovim.io/doc/user/luvref.html#uv.fs_utime()
+---
+---@async
+---@param path string
+---@param atime integer
+---@param mtime integer
+---@return string? err
+---@return boolean? success
+M.fs_utime = wrap(vim.uv.fs_utime)
+
+--- https://neovim.io/doc/user/luvref.html#uv.fs_link()
+---
+---@async
+---@param path string
+---@param new_path string
+---@return string? err
+---@return boolean? success
+M.fs_link = wrap(vim.uv.fs_link)
+
+--- https://neovim.io/doc/user/luvref.html#uv.fs_symlink()
+---
+---@async
+---@param path string
+---@param new_path string
+---@param flags? table|integer
+---@return string? err
+---@return boolean? success
+M.fs_symlink = wrap(vim.uv.fs_symlink)
+
+--- https://neovim.io/doc/user/luvref.html#uv.fs_readlink()
+---
+---@async
+---@param path string
+---@return string? err
+---@return string? path
+M.fs_readlink = wrap(vim.uv.fs_readlink)
+
+--- https://neovim.io/doc/user/luvref.html#uv.fs_realpath()
+---
+---@async
+---@param path string
+M.fs_realpath = wrap(vim.uv.fs_realpath)
+
 --- https://neovim.io/doc/user/luvref.html#uv.fs_chown()
 ---
 ---@async
@@ -292,6 +367,30 @@ M.fs_rename = wrap(vim.uv.fs_rename)
 ---@return string? err
 ---@return boolean? success
 M.fs_chown = wrap(vim.uv.fs_chown)
+
+--- https://neovim.io/doc/user/luvref.html#uv.fs_fchown()
+---
+---@async
+---@param fd integer
+---@param uid integer
+---@param gid integer
+M.fs_fchown = wrap(vim.uv.fs_fchown)
+
+--- https://neovim.io/doc/user/luvref.html#uv.fs_lchown()
+---
+---@async
+---@param fd integer
+---@param uid integer
+---@param gid integer
+M.fs_lchown = wrap(vim.uv.fs_lchown)
+
+--- https://neovim.io/doc/user/luvref.html#uv.fs_copyfile()
+---
+---@async
+---@param path string
+---@param new_path string
+---@param flags? table|integer
+M.fs_copyfile = wrap(vim.uv.fs_copyfile)
 
 --- https://neovim.io/doc/user/luvref.html#uv.fs_opendir()
 ---
