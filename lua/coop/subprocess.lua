@@ -19,6 +19,9 @@ M.STREAM = "stream"
 ---@class SpawnOptions
 ---@field args? table The arguments to pass to the process.
 ---@field stdio? table The stdio configuration for the process.
+---                    Accepts either same values as vim.uv.spawn, or PIPE or STREAM.
+---                    If PIPE is provided, a uv_pipe_t is provided in the returned process object.
+---                    If STREAM is provided, a StreamReader/Writer is provided in the returned process object.
 ---@field env? table The environment variables for the process.
 ---@field cwd? string The current working directory for the process.
 ---@field uid? integer The user id for the process.
