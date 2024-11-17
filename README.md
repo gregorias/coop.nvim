@@ -260,6 +260,39 @@ function main()
 end
 ```
 
+#### `coop.uv-utils`
+
+[The `uv-utils` module](https://github.com/gregorias/coop.nvim/blob/main/lua/coop/uv-utils.lua)
+provides `StreamReader` and `StreamWriter`,
+two wrappers that turn callback-based Libuv streams (`uv_stream_t`) into
+objects with asynchronous task functions.
+
+<details>
+
+<summary>Code example</summary>
+
+```lua
+local coop = require("coop")
+local StreamReader = require('coop.uv-utils').StreamReader
+local StreamWriter = require('coop.uv-utils').StreamWriter
+
+local fds = vim.uv.pipe({ nonblock = true }, { nonblock = true })
+local sr = StreamReader.from_fd(fds.read)
+local sw = StreamWriter.from_fd(fds.write)
+
+local result = coop.spawn(function()
+  sw:write("Hello, world!")
+  sw:close()
+  local data = sr:read_until_eof()
+  sr:close()
+  return data
+end).await(5000, 1)
+
+assert(result == "Hello, world!")
+```
+
+</details>
+
 ## ✅ Comparison to similar tools
 
 ### Nio
