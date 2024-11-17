@@ -114,6 +114,8 @@ M.spawn = function(path, options)
 	return handle, pid, future
 end
 
+--- vim.uv.process_kill is already synchronous.
+
 --- https://neovim.io/doc/user/luvref.html#uv.shutdown()
 ---
 ---@async

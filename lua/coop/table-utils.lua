@@ -40,6 +40,18 @@ M.safe_insert = function(t, pos, len, v)
 	t[pos] = v
 end
 
+--- Copies a table shallowly.
+---
+---@param t table The table to copy.
+---@return table copy
+M.shallow_copy = function(t)
+	local copy = {}
+	for k, v in pairs(t) do
+		copy[k] = v
+	end
+	return copy
+end
+
 --- Shifts elements of a list to the left.
 ---
 ---@param t table The list to shift.

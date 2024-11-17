@@ -237,6 +237,38 @@ end)
 
 </details>
 
+#### `coop.subprocess`
+
+[The `subprocess` module](https://github.com/gregorias/coop.nvim/blob/main/lua/coop/subprocess.lua)
+provides a way to launch subprocess and control their I/O with task functions.
+
+<details>
+
+<summary>Code example</summary>
+
+```lua
+local coop = require("coop")
+local subprocess = require("coop.subprocess")
+
+---@async
+function pass_printf_to_cat()
+  local printf = subprocess.spawn("printf", {
+    args = { "Hello, world!" },
+    stdio = { nil, subprocess.PIPE },
+  })
+  local cat = subprocess.spawn("cat", {
+    stdio = { printf.stdout, subprocess.STREAM },
+  })
+  vim.print(cat.stdout:read_until_eof())
+  printf:await()
+  cat:await()
+end
+
+coop.spawn(pass_printf_to_cat)
+```
+
+</details
+
 #### `coop.uv`
 
 [The `uv` module](https://github.com/gregorias/coop.nvim/blob/main/lua/coop/uv.lua)
