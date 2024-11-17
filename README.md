@@ -243,23 +243,6 @@ end)
 provides task function versions of asynchronous functions in
 [`vim.uv`][Neovim UV].
 
-### FAQ
-
-#### How do I block until an asynchronous function is done in synchronous code?
-
-Asynchronous code doesn’t mix with synchronous functions.
-If you need to wait in your synchronous code until an asynchronous task is
-done, Coop implements a busy-waiting mechanism based on `vim.wait`:
-
-```lua
---- This is a synchronous function.
-function main()
-  local task = coop.spawn(...)
-  -- Wait for 5 seconds and poll every 20 milliseconds.
-  return task:await(5000, 20)
-end
-```
-
 #### `coop.uv-utils`
 
 [The `uv-utils` module](https://github.com/gregorias/coop.nvim/blob/main/lua/coop/uv-utils.lua)
@@ -292,6 +275,23 @@ assert(result == "Hello, world!")
 ```
 
 </details>
+
+### FAQ
+
+#### How do I block until an asynchronous function is done in synchronous code?
+
+Asynchronous code doesn’t mix with synchronous functions.
+If you need to wait in your synchronous code until an asynchronous task is
+done, Coop implements a busy-waiting mechanism based on `vim.wait`:
+
+```lua
+--- This is a synchronous function.
+function main()
+  local task = coop.spawn(...)
+  -- Wait for 5 seconds and poll every 20 milliseconds.
+  return task:await(5000, 20)
+end
+```
 
 ## ✅ Comparison to similar tools
 
