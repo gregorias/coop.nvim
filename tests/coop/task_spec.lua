@@ -1,5 +1,6 @@
 --- Busted tests for coop.task.
 local coop = require("coop")
+local sleep = require("coop.uv-utils").sleep
 local copcall = require("coop.coroutine-utils").copcall
 local task = require("coop.task")
 local uv = require("coop.uv")
@@ -9,7 +10,7 @@ describe("coop.task", function()
 		it("cancelled task’s future returns an error and it becomes dead", function()
 			local done = false
 			local spawned_task = coop.spawn(function()
-				uv.sleep(20)
+				sleep(20)
 				done = true
 			end)
 
@@ -27,7 +28,7 @@ describe("coop.task", function()
 		it("can be captured in yield", function()
 			local success, err_msg = true, ""
 			local spawned_task = coop.spawn(function()
-				success, err_msg = copcall(uv.sleep, 20)
+				success, err_msg = copcall(sleep, 20)
 				error(err_msg)
 			end)
 
@@ -40,7 +41,7 @@ describe("coop.task", function()
 
 		it("can uncancelled by user", function()
 			local spawned_task = coop.spawn(function()
-				copcall(uv.sleep, 20)
+				copcall(sleep, 20)
 				return "done"
 			end)
 

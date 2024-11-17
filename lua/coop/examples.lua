@@ -1,5 +1,6 @@
 local M = {}
 local coop = require("coop")
+local sleep = require("coop.uv-utils").sleep
 local copcall = require("coop.coroutine-utils").copcall
 local await_any = require("coop.control").await_any
 local as_completed = require("coop.control").as_completed
@@ -75,7 +76,7 @@ M.sort_with_time = function(values)
 	-- For each number, create a task that sleeps for that number of milliseconds.
 	for i, value in ipairs(values) do
 		tasks[i] = coop.spawn(function()
-			uv.sleep(value)
+			sleep(value)
 			return value
 		end)
 	end
@@ -97,7 +98,7 @@ end
 ---@return string result the result of the slow task
 M.run_parallel_search = function()
 	local slow_tf = function()
-		local success, err_msg = copcall(uv.sleep, 5000)
+		local success, err_msg = copcall(sleep, 5000)
 		if not success and err_msg == "cancelled" then
 			return "cancelled"
 		else
@@ -106,7 +107,7 @@ M.run_parallel_search = function()
 	end
 
 	local fast_tf = function()
-		local success, err_msg = copcall(uv.sleep, 30)
+		local success, err_msg = copcall(sleep, 30)
 		if not success and err_msg == "cancelled" then
 			return "cancelled"
 		else

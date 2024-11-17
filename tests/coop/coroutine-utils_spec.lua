@@ -1,6 +1,7 @@
 --- Busted tests for coop.coroutine-utils.
 local coop = require("coop")
 local uv = require("coop.uv")
+local sleep = require("coop.uv-utils").sleep
 local coroutine_utils = require("coop.coroutine-utils")
 local copcall = coroutine_utils.copcall
 local pack = require("coop.table-utils").pack
@@ -80,7 +81,7 @@ describe("coop.coroutine-utils", function()
 	describe("copcall", function()
 		it("executes a throwing coroutine function in a protected mode", function()
 			local throw_after_sleep = function()
-				uv.sleep(2)
+				sleep(2)
 				error("error", 0)
 			end
 			local f_co = function()
@@ -95,7 +96,7 @@ describe("coop.coroutine-utils", function()
 
 		it("executes a successful coroutine function in a protected mode", function()
 			local throw_after_sleep = function()
-				uv.sleep(2)
+				sleep(2)
 				return "foo", nil, "bar"
 			end
 			local f_co = function()

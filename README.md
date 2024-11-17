@@ -278,13 +278,16 @@ provides task function versions of asynchronous functions in
 #### `coop.uv-utils`
 
 [The `uv-utils` module](https://github.com/gregorias/coop.nvim/blob/main/lua/coop/uv-utils.lua)
-provides `StreamReader` and `StreamWriter`,
-two wrappers that turn callback-based Libuv streams (`uv_stream_t`) into
-objects with asynchronous task functions.
+provides the following:
+
+- `sleep`, a function that puts the running thread to sleep for a number of
+  milliseconds.
+- `StreamReader` and `StreamWriter`, two wrappers that turn callback-based
+  Libuv streams (`uv_stream_t`) into objects with asynchronous task functions.
 
 <details>
 
-<summary>Code example</summary>
+<summary>Stream example</summary>
 
 ```lua
 local coop = require("coop")

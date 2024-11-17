@@ -5,7 +5,6 @@
 local M = {}
 
 local coop = require("coop")
-local copcall = require("coop").copcall
 
 -- Types seen in the official reference.
 
@@ -97,21 +96,6 @@ M.timer_start = function(timer, timeout)
 	end
 
 	return coop.cb_to_tf(timer_start_cb)(timer, timeout)
-end
-
---- Sleeps for a number of milliseconds.
----
----@async
----@param ms number The number of milliseconds to sleep.
-M.sleep = function(ms)
-	local timer = vim.uv.new_timer()
-	local success, err = copcall(M.timer_start, timer, ms, 0)
-	-- Safely close resources even in case of a cancellation error.
-	timer:stop()
-	timer:close()
-	if not success then
-		error(err, 0)
-	end
 end
 
 --- Spawns a new process.

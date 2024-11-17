@@ -1,8 +1,27 @@
 --- Utilities for working with libuv.
 ---
+--- sleep: Sleeps for a number of milliseconds.
 --- StreamReader: An async wrapper for a readable uv_stream_t.
 --- StreamWriter: An async wrapper for a writable uv_stream_t.
 local M = {}
+
+--- Sleeps for a number of milliseconds.
+---
+---@async
+---@param ms number The number of milliseconds to sleep.
+M.sleep = function(ms)
+	local uv = require("coop.uv")
+	local copcall = require("coop.coroutine-utils").copcall
+
+	local timer = vim.uv.new_timer()
+	local success, err = copcall(uv.timer_start, timer, ms, 0)
+	-- Safely close resources even in case of a cancellation error.
+	timer:stop()
+	timer:close()
+	if not success then
+		error(err, 0)
+	end
+end
 
 --- A stream reader is an async wrapper for a readable uv_stream_t.
 ---

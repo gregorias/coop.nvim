@@ -1,7 +1,7 @@
 --- Busted tests for coop.table-utils.
 local coop = require("coop")
 local copcall = require("coop.coroutine-utils").copcall
-local uv = require("coop.uv")
+local sleep = require("coop.uv-utils").sleep
 
 describe("coop.future", function()
 	describe("Future", function()
@@ -46,7 +46,7 @@ describe("coop.future", function()
 
 			it("returns nothing if the future is still unfinished", function()
 				local result = coop.spawn(function()
-					uv.sleep(1000)
+					sleep(1000)
 					return "foo"
 				end):await(1)
 				assert.is.Nil(result)

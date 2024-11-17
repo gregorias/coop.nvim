@@ -5,6 +5,49 @@ local uv_utils = require("coop.uv-utils")
 local pack = require("coop.table-utils").pack
 
 describe("coop.uv-utils", function()
+	describe("sleep", function()
+		local sleep = uv_utils.sleep
+		it("sleeps for some time in an asynchronous coroutine", function()
+			local done = false
+
+			local spawned_task = coop.spawn(function()
+				sleep(50)
+				done = true
+			end)
+
+			-- The timer should not be done yet and should execute asynchronously.
+			assert.is.False(done)
+
+			spawned_task:await(100, 20)
+			assert.is.True(done)
+		end)
+
+		it("works with an vim.api call", function()
+			local spawned_task = coop.spawn(function()
+				sleep(50)
+				return vim.api.nvim_get_current_line()
+			end)
+
+			local result = spawned_task:await(100, 20)
+			assert.are.same("", result)
+		end)
+
+		it("handles cancellation", function()
+			local done = false
+
+			local spawned_task = coop.spawn(function()
+				sleep(50)
+				done = true
+			end)
+			spawned_task:cancel()
+
+			assert.has.error(function()
+				spawned_task:await(1, 2)
+			end, "cancelled")
+			assert.is.False(done)
+		end)
+	end)
+
 	describe("Stream Reader & StreamWriter", function()
 		it("works with two connected pipes", function()
 			local result = coop.spawn(function()
