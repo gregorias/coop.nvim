@@ -267,7 +267,7 @@ end
 coop.spawn(pass_printf_to_cat)
 ```
 
-</details
+</details>
 
 #### `coop.uv`
 
