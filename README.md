@@ -242,7 +242,7 @@ end)
 #### `coop.subprocess`
 
 [The `subprocess` module](https://github.com/gregorias/coop.nvim/blob/main/lua/coop/subprocess.lua)
-provides a way to launch subprocess and control their I/O with task functions.
+provides a way to launch subprocesses and control their I/O with task functions.
 
 <details>
 
