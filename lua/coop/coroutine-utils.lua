@@ -20,7 +20,7 @@ local pack = require("coop.table-utils").pack
 M.cb_to_co = function(f)
 	local f_co = function(...)
 		local this = coroutine.running()
-		assert(this ~= nil, "The result of cb_to_tf must be called within a task.")
+		assert(this ~= nil, "The result of cb_to_co must be called within a task.")
 
 		local f_status = "running"
 		local f_ret = pack()
