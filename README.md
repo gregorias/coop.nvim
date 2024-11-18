@@ -176,10 +176,12 @@ And an await method that has three variants:
 function task.await(task, cb_or_timeout, interval)
 end
 
--- task.await() is a task function that waits for the task finish and return a result
+-- task.await() is a task function that waits for the task finish and return a
+-- result
 result = task.await()
 
--- task.await(cb) is a callback-based function that calls the callback once the task is finished.
+-- task.await(cb) is a callback-based function that calls the callback once the
+-- task is finished.
 -- It doesn’t wait for the task.
 task.await(function(success, result) end)
 
