@@ -9,6 +9,12 @@ local pack = require("coop.table-utils").pack
 -- ADR: Keep cb_to_co and cb_to_tf. One of Coop’s purposes is educational.
 -- Keep `cb_to_co` to show how a simplified conversion looks like.
 
+-- ADR: Should the resume continuation callback return a value to the caller?
+-- I decided that it should not to keep things simple. Usually, the caller will be the I/O thread, which doesn’t
+-- do anything with such return values. The I/O thread is only interested in running the continuation. That’s
+-- how such callbacks work.
+-- If the user wants error handling, Tasks have a reasonable interface for that.
+
 --- Converts a callback-based function to a coroutine function.
 ---
 --- If the callback is called asynchronously, then the coroutine function yields exactly once and is resumed by whoever
