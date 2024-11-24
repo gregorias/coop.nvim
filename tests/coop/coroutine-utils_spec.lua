@@ -1,6 +1,5 @@
 --- Busted tests for coop.coroutine-utils.
 local coop = require("coop")
-local uv = require("coop.uv")
 local sleep = require("coop.uv-utils").sleep
 local coroutine_utils = require("coop.coroutine-utils")
 local copcall = coroutine_utils.copcall
@@ -109,6 +108,21 @@ describe("coop.coroutine-utils", function()
 			assert.are.same("foo", val_foo)
 			assert.is.Nil(val_nil)
 			assert.are.same("bar", val_bar)
+		end)
+	end)
+
+	describe("fire_and_forget", function()
+		it("runs the coroutine function", function()
+			local first_stage = false
+			local second_stage = false
+			coroutine_utils.fire_and_forget(function()
+				first_stage = true
+				coroutine.yield()
+				second_stage = true
+			end)
+
+			assert.is.True(first_stage)
+			assert.is.False(second_stage)
 		end)
 	end)
 end)

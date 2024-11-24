@@ -51,6 +51,13 @@ M.cb_to_co = function(f)
 	return f_co
 end
 
+--- Spawns a fire-and-forget coroutine function in a coroutine.
+---
+---@param f async function The coroutine function to spawn.
+M.fire_and_forget = function(f, ...)
+	coroutine.resume(coroutine.create(f), ...)
+end
+
 --- Executes a coroutine function in a protected mode.
 ---
 --- This is also a coroutine function.
