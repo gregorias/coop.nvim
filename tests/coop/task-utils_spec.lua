@@ -195,4 +195,59 @@ describe("coop.task-utils", function()
 			assert.are.same("foo", f_err)
 		end)
 	end)
+
+	describe("co_to_tf", function()
+		local co_to_tf = require("coop.task-utils").co_to_tf
+
+		it("converts a regular coroutine function to a task function", function()
+			local f_co = function(a, b)
+				local arg = coroutine.yield(a + b, nil, a * b)
+				return arg + 1
+			end
+
+			local f_tf = co_to_tf(f_co)
+
+			local t = task.create(f_tf)
+			local success, f_ret_sum, f_ret_nil, f_ret_mul = t:resume(1, 2)
+
+			assert.is.True(success)
+			assert.are.same(3, f_ret_sum)
+			assert.is.Nil(f_ret_nil)
+			assert.are.same(2, f_ret_mul)
+
+			local success_2, f_ret_inc = t:resume(4)
+
+			assert.is.True(success_2)
+			assert.are.same(5, f_ret_inc)
+
+			assert.are.same("dead", t:status())
+		end)
+
+		it("forwards errors", function()
+			local f_co = function()
+				error("foo", 0)
+			end
+
+			local f_tf = co_to_tf(f_co)
+			local t = task.create(f_tf)
+			local success, err = t:resume()
+
+			assert.is.False(success)
+			assert.are.same("foo", err)
+		end)
+
+		it("result can be cancelled", function()
+			local f_co = function()
+				coroutine.yield()
+			end
+			local f_tf = co_to_tf(f_co)
+			local t = task.create(f_tf)
+			t:cancel()
+			local success, err = t:resume()
+
+			assert.is.False(success)
+			assert.are.same("cancelled", err)
+			assert.are.same("dead", t:status())
+		end)
+	end)
 end)

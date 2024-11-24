@@ -89,4 +89,30 @@ M.spawn = function(f_co, ...)
 	return spawned_task
 end
 
+--- Transforms a coroutine function into a task function.
+---
+---@param f_co async function The coroutine function.
+---@return async function tf The task function.
+M.co_to_tf = function(f_co)
+	local unpack_packed = require("coop.table-utils").unpack_packed
+
+	return function(...)
+		local thread = coroutine.create(f_co)
+		local results = pack(coroutine.resume(thread, ...))
+		while true do
+			if not results[1] then
+				error(results[2], 0)
+			end
+
+			if coroutine.status(thread) == "dead" then
+				return unpack(results, 2, results.n)
+			end
+
+			-- The coroutine function has yielded, so we need to yield as well.
+			local args = pack(task.yield(unpack(results, 2, results.n)))
+			results = pack(coroutine.resume(thread, unpack_packed(args)))
+		end
+	end
+end
+
 return M
