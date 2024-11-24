@@ -3,11 +3,10 @@ local coop = require("coop")
 local sleep = require("coop.uv-utils").sleep
 local copcall = require("coop.coroutine-utils").copcall
 local task = require("coop.task")
-local uv = require("coop.uv")
 
 describe("coop.task", function()
 	describe("cancel", function()
-		it("cancelled task’s future returns an error and it becomes dead", function()
+		it("cancelled task’s future returns an error and the task becomes dead", function()
 			local done = false
 			local spawned_task = coop.spawn(function()
 				sleep(20)
@@ -80,6 +79,26 @@ describe("coop.task", function()
 
 			assert.is.False(success)
 			assert.are.same("Tried to resume a task that is not suspended but dead.", err_msg)
+		end)
+
+		it("captures the final return value (coroutine)", function()
+			local t = coroutine.create(function()
+				return "foo"
+			end)
+			local success, foo = coroutine.resume(t)
+
+			assert.is.True(success)
+			assert.are.same("foo", foo)
+		end)
+
+		it("captures the final return value", function()
+			local t = task.create(function()
+				return "foo"
+			end)
+			local success, foo = t:resume()
+
+			assert.is.True(success)
+			assert.are.same("foo", foo)
 		end)
 	end)
 

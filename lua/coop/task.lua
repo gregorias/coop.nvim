@@ -33,9 +33,7 @@ M.create = function(tf)
 	local future = future_m.Future.new()
 
 	local task = {
-		thread = coroutine.create(function(...)
-			future:complete(tf(...))
-		end),
+		thread = coroutine.create(tf),
 		future = future,
 		cancelled = false,
 	}
@@ -74,6 +72,8 @@ M.resume = function(task, ...)
 
 	if not results[1] then
 		task.future:error(results[2])
+	elseif coroutine.status(task.thread) == "dead" then
+		task.future:complete(unpack(results, 2, results.n))
 	end
 
 	return unpack(results, 1, results.n)
