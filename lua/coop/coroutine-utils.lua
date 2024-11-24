@@ -66,7 +66,7 @@ end
 --- pcall. copcall goes around that restriction by using coroutine.resume.
 ---
 ---@async
----@param f_co function A coroutine function to execute.
+---@param f_co async function A coroutine function to execute.
 ---@return boolean success Whether the coroutine function executed successfully.
 ---@return ... The results of the coroutine function.
 M.copcall = function(f_co, ...)
