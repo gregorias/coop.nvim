@@ -15,8 +15,8 @@ local pack = require("coop.table-utils").pack
 --- calls the callback. If the callback is called synchronously, then the coroutine function returns immediately.
 ---
 ---@param  f function The function to convert. The callback needs to be its first argument.
----@return function co A coroutine function. Accepts the same arguments as f without the callback.
----                    Returns what f has passed to the callback.
+---@return async function co A coroutine function. Accepts the same arguments as f without the callback.
+---                          Returns what f has passed to the callback.
 M.cb_to_co = function(f)
 	local f_co = function(...)
 		local this = coroutine.running()
