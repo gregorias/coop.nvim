@@ -37,7 +37,19 @@ The project overall had the following design guidelines:
 ### On using tasks (coroutine + future)
 
 This record is about the decision to implement the `task` interface that
-replaces `coroutine`.
+replaces `coroutine` instead of using pure coroutines.
+
+### The need to wait
+
+You can’t build awaiting primitives with pure coroutines.
+The proof would look something like this: Lua is single-threaded, so something
+needs to wake and run waiting threads. That means that someone needs keep a list
+of waiters. You can’t store such data in pure coroutines.
+
+The awaiting feature requires bundling in a waiting queue (a future) together
+with a thread.
+
+### The need to capture errors
 
 I want the framework to treat coroutine functions almost like regular functions
 and have the capability to wait for results of a parallelized operation with futures.
