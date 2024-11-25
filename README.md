@@ -330,6 +330,19 @@ function main()
 end
 ```
 
+#### Can I mix coroutine functions and task functions?
+
+No.
+
+You can not use coroutine functions in task functions, because when coroutine
+yield doesn’t handle cancellation.
+
+You can not use task functions in coroutines, because `task.yield` requires
+running in a task.
+
+You may however convert coroutine functions to task functions with
+`coop.task-utils.co_to_tf`.
+
 ## ✅ Comparison to similar tools
 
 ### Nio
