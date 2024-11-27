@@ -92,15 +92,17 @@ end
 ---@param self StreamReader
 ---@return string data The data read from the stream.
 M.StreamReader.read_until_eof = function(self)
-	local data = ""
+	local data = {}
 
 	local chunk = self:read()
+	local i = 1
 	while chunk ~= nil do
-		data = data .. chunk
+		data[i] = chunk
+		i = i + 1
 		chunk = self:read()
 	end
 
-	return data
+	return table.concat(data, "")
 end
 
 --- Closes the stream reader.
