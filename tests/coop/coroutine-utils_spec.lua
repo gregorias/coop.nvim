@@ -45,17 +45,20 @@ describe("coop.coroutine-utils", function()
 			assert.are.same(3, f_co_ret)
 		end)
 
-		it("works with an immediate callback-based function that returns multiple results", function()
-			local f = function(cb, a, b)
-				cb(a + b, nil, a * b)
+		it(
+			"works with an immediate callback-based function that returns multiple results",
+			function()
+				local f = function(cb, a, b)
+					cb(a + b, nil, a * b)
+				end
+
+				local _, f_co_ret_sum, f_co_nil, f_co_ret_mul = spawn(cb_to_co(f), 1, 2)
+
+				assert.are.same(3, f_co_ret_sum)
+				assert.is.Nil(f_co_nil)
+				assert.are.same(2, f_co_ret_mul)
 			end
-
-			local _, f_co_ret_sum, f_co_nil, f_co_ret_mul = spawn(cb_to_co(f), 1, 2)
-
-			assert.are.same(3, f_co_ret_sum)
-			assert.is.Nil(f_co_nil)
-			assert.are.same(2, f_co_ret_mul)
-		end)
+		)
 
 		it("works with a delayed callback-based function that returns multiple results", function()
 			local f, f_resume = create_blocked_cb_function(function(a, b)

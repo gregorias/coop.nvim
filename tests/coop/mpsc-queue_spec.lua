@@ -64,7 +64,7 @@ describe("coop.mpsc-queue", function()
 			end)
 
 			assert.has_error(function()
-					q:pop()
+				q:pop()
 			end, "Some other task is already waiting for a value.")
 		end)
 
@@ -72,7 +72,7 @@ describe("coop.mpsc-queue", function()
 			local q = mpsc_queue.MpscQueue.new()
 
 			assert.has_error(function()
-					q:pop()
+				q:pop()
 			end, "Pop must be called within a task.")
 		end)
 	end)

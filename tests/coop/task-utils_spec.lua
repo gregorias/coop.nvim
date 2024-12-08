@@ -62,17 +62,20 @@ describe("coop.task-utils", function()
 			assert.are.same(3, f_tf_ret)
 		end)
 
-		it("works with an immediate callback-based function that returns multiple results", function()
-			local f = function(cb, a, b)
-				cb(a + b, nil, a * b)
+		it(
+			"works with an immediate callback-based function that returns multiple results",
+			function()
+				local f = function(cb, a, b)
+					cb(a + b, nil, a * b)
+				end
+
+				local f_tf_ret_sum, f_tf_nil, f_tf_ret_mul = coop.spawn(cb_to_tf(f), 1, 2):await()
+
+				assert.are.same(3, f_tf_ret_sum)
+				assert.is.Nil(f_tf_nil)
+				assert.are.same(2, f_tf_ret_mul)
 			end
-
-			local f_tf_ret_sum, f_tf_nil, f_tf_ret_mul = coop.spawn(cb_to_tf(f), 1, 2):await()
-
-			assert.are.same(3, f_tf_ret_sum)
-			assert.is.Nil(f_tf_nil)
-			assert.are.same(2, f_tf_ret_mul)
-		end)
+		)
 
 		it("works with a delayed callback-based function that returns multiple results", function()
 			local f, f_resume = create_blocked_cb_function(function(a, b)

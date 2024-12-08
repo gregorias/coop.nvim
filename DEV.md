@@ -9,6 +9,7 @@ This project requires the following tools:
 - [Commitlint]
 - [Just]
 - [Lefthook]
+- [Stylua]
 
 Install lefthook:
 
@@ -95,3 +96,4 @@ This is inline with the design goal to avoid asynchronous boilerplate.
 [Commitlint]: https://github.com/conventional-changelog/commitlint
 [Lefthook]: https://github.com/evilmartians/lefthook
 [Just]: https://just.systems/
+[Stylua]: https://github.com/JohnnyMorganz/StyLua

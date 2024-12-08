@@ -140,7 +140,10 @@ M.pyield = function(...)
 	local this = M.running()
 
 	if not this then
-		error("coroutine.yield returned without a running task. Make sure that you use task.resume to resume tasks.", 0)
+		error(
+			"coroutine.yield returned without a running task. Make sure that you use task.resume to resume tasks.",
+			0
+		)
 	end
 
 	if this.cancelled then
