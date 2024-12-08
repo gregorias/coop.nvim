@@ -202,6 +202,10 @@ The essential task-related functions live in `coop.task` and `coop.task-utils` m
 
 ### Library reference
 
+#### `coop.lsp.client`
+
+[The `coop.lsp.client` module](https://github.com/gregorias/coop.nvim/blob/main/lua/coop/lsp/client.lua) provides a task function implementation for [`Client:request`](https://neovim.io/doc/user/lsp.html#Client%3Arequest()).
+
 #### `coop.mpsc-queue`
 
 [The `mpsc-queue` module](https://github.com/gregorias/coop.nvim/blob/main/lua/coop/mpsc-queue.lua)
