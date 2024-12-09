@@ -30,16 +30,6 @@ Here’s what else you can expect from Coop:
   function. If the callback-based function is non-blocking, so will the task
   function be.
 
-> [!WARNING]
-> Coop.nvim is right now in a preview release.
->
-> - The interfaces should be mostly stable.
-> - Some ports of standard library functions are missing.
-> - Additional control function are missing.
->
-> I want to see if there’s any initial reception before I commit fully to
-> implementing all batteries.
-
 ## ⚡️ Requirements
 
 - Neovim 0.10+
