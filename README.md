@@ -44,12 +44,15 @@ Install the plugin with your preferred package manager, such as [Lazy]:
 }
 ```
 
-## 🚀 Usage
+## 🚀 Usage tutorial
+
+This section is a Coop tutorial by example.
 
 ### Hello, world
 
 Let’s start with the hello world of asynchronicity: reading a file.
-Below is an end-to-end code that shows how to concurrently read two files with Coop:
+Below is an end-to-end code that shows how to concurrently read two files with
+Coop:
 
 ```lua
 local coop = require("coop")
@@ -101,7 +104,7 @@ completes.
 is the final example. It shows the flexible cancellation mechanism together
 with error handling through `copcall`.
 
-### Interface guide
+## 🦮 Interface guide
 
 This section introduces the essential interfaces.
 
@@ -117,36 +120,60 @@ synchronous code, you need to wrap them in a **task**, which represents a
 thread.
 You usually do the wrapping with `coop.spawn` (see aforementioned examples).
 
-#### Task
+### Task
 
-The main abstraction of Coop is a **task**.
 A **task** is an extension of a Lua coroutine with three capabilities:
 
 - Holding results (including errors)
 - Awaiting
 - Cancellation
 
-A task behaves like a coroutine and comes with its own equivalent functions that behave analogously:
+A task behaves like a coroutine and comes with its own equivalent functions:
 
 ```lua
+--- Creates a task from a task function.
+---
+---@param task_function @async fun
+---@return Task task
 task.create
+
+--- Resumes a task.
+---
+---@param task Task
+---@param ...
+---@return boolean success
+---@return ...
 task.resume
 
+--- Yields from a task functions it’s in.
+---
 --- Yield throws `error("cancelled")` if in a cancelled task.
+---
+---@async
+---@param ...
+---@return ...
 task.yield
 
+--- Returns the task’s status.
+---
+---@param task Task
+---@return string "running" | "suspended" | "normal" | "dead"
 task.status
+
+--- Returns the running task.
+---
+---@return Task?
 task.running
 ```
 
 There’s also `pyield` variant of `yield` that returns `success, results`
 instead of throwing an error.
 
-`task.create` creates a new thread and accepts **task functions**.
-Instead of `task.create` you should usually use `coop.spawn`, which creates a
+Instead of `task.create`, you should usually use `coop.spawn`, which creates a
 new task and resumes it.
 
-Tasks come with two additional functions. A cancel function (which is also a method):
+Tasks come with two additional functions.
+A cancel function (which is also a method):
 
 ```lua
 --- Cancels the task.
@@ -163,24 +190,25 @@ And an await method that has three variants:
 
 ```lua
 -- Awaits task completion.
-function task.await(task, cb_or_timeout, interval)
+function task.await(self, cb_or_timeout, interval)
 end
 
 -- task.await() is a task function that waits for the task finish and return a
 -- result
-result = task.await()
+result = task:await()
 
 -- task.await(cb) is a callback-based function that calls the callback once the
 -- task is finished.
 -- It doesn’t wait for the task.
-task.await(function(success, result) end)
+task:await(function(success, result) end)
 
--- task.await(timeout, interval) is a blocking function that uses vim.wait to implement a busy-waiting loop.
-task.await(1000, 100) -- Wait for 1s for the task to finish. Check every 100ms
+-- task.await(timeout, interval) is a blocking function that uses vim.wait to
+-- implement a busy-waiting loop.
+task:await(1000, 100) -- Wait for 1s for the task to finish. Check every 100ms
 ```
 
-Tasks implement a call operator that calls `await`. This allows for a fluent interface where tasks appear as
-if they were regular task functions:
+Tasks implement a call operator that calls `await`. This allows for a fluent
+interface where tasks appear as if they were regular task functions:
 
 ```lua
 local get_result_1 = coop.spawn(compute, 100)
@@ -190,13 +218,15 @@ local result = get_result_1()
 
 The essential task-related functions live in `coop.task` and `coop.task-utils` modules.
 
-### Library reference
+## 📙 Library reference
 
-#### `coop.lsp.client`
+### `coop.lsp.client`
 
-[The `coop.lsp.client` module](https://github.com/gregorias/coop.nvim/blob/main/lua/coop/lsp/client.lua) provides a task function implementation for [`Client:request`](https://neovim.io/doc/user/lsp.html#Client%3Arequest()).
+[The `coop.lsp.client` module](https://github.com/gregorias/coop.nvim/blob/main/lua/coop/lsp/client.lua)
+provides a task function implementation for
+[`Client:request`](https://neovim.io/doc/user/lsp.html#Client%3Arequest()).
 
-#### `coop.mpsc-queue`
+### `coop.mpsc-queue`
 
 [The `mpsc-queue` module](https://github.com/gregorias/coop.nvim/blob/main/lua/coop/mpsc-queue.lua)
 provides a multiple-producer single-consumer concurrent
@@ -233,7 +263,7 @@ end)
 
 </details>
 
-#### `coop.subprocess`
+### `coop.subprocess`
 
 [The `subprocess` module](https://github.com/gregorias/coop.nvim/blob/main/lua/coop/subprocess.lua)
 provides a way to launch subprocesses and control their I/O with task functions.
@@ -265,13 +295,13 @@ coop.spawn(pass_printf_to_cat)
 
 </details>
 
-#### `coop.uv`
+### `coop.uv`
 
 [The `uv` module](https://github.com/gregorias/coop.nvim/blob/main/lua/coop/uv.lua)
 provides task function versions of asynchronous functions in
 [`vim.uv`][Neovim UV].
 
-#### `coop.uv-utils`
+### `coop.uv-utils`
 
 [The `uv-utils` module](https://github.com/gregorias/coop.nvim/blob/main/lua/coop/uv-utils.lua)
 provides the following:
@@ -307,9 +337,9 @@ assert(result == "Hello, world!")
 
 </details>
 
-### FAQ
+## FAQ
 
-#### How do I block until an asynchronous function is done in synchronous code?
+### How do I block until an asynchronous function is done in synchronous code?
 
 Asynchronous code doesn’t mix with synchronous functions.
 If you need to wait in your synchronous code until an asynchronous task is
@@ -324,7 +354,7 @@ function main()
 end
 ```
 
-#### Can I mix coroutine functions and task functions?
+### Can I mix coroutine functions and task functions?
 
 No.
 
