@@ -16,7 +16,7 @@ If you write Lua code in Neovim, Coop lets you write non-blocking code that
 looks synchronous.
 It’s like async/await in some other languages.
 
-Coop was designed to
+Coop was designed with the following principles:
 
 - Be simple. [Coop should be easy to explain.](How%20it%20works.md)
 - Stay close to native Lua coroutines and Lua’s idioms.
