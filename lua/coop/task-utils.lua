@@ -62,8 +62,8 @@ M.cb_to_tf = function(f, opts)
 		if f_status == "running" then
 			-- If we are here, then `f` must not have called the callback yet, so it will do so asynchronously.
 			-- Yield control and wait for the callback to resume it.
-			local not_cancelled, err_msg = task.pyield()
-			if not not_cancelled then
+			local running, err_msg = task.pyield()
+			if not running then
 				f_status = "cancelled"
 				opts.on_cancel(pack(...), f_ret)
 				error(err_msg, 0)

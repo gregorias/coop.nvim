@@ -68,9 +68,9 @@ M.MpscQueue.pop = function(self)
 		end
 
 		self.waiting = this
-		local success, value = task.pyield()
+		local running, value = task.pyield()
 		self.waiting = nil
-		if success then
+		if running then
 			return value
 		else
 			error(value, 0)
