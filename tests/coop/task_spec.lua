@@ -16,8 +16,11 @@ describe("coop.task", function()
 			-- Immediately cancel the task.
 			spawned_task:cancel()
 
-			-- Let the timer run out.
-			vim.wait(40)
+			spawned_task:await(function (success, result)
+				assert.are.same("dead", spawned_task:status())
+				assert.is.False(success)
+				assert.are.same("cancelled", result)
+			end)
 
 			-- Test that the task didn’t finish.
 			assert.is.False(done)
