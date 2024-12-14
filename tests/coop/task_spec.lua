@@ -111,14 +111,22 @@ describe("coop.task", function()
 				task.yield()
 			end)
 
-			coroutine.resume(t.thread)
 			local success, err_msg = coroutine.resume(t.thread)
 
 			assert.is.False(success)
-			assert.are.same(
-				"coroutine.yield returned without a running task. Make sure that you use task.resume to resume tasks.",
-				err_msg
-			)
+			assert.are.same("Called pyield outside of a running task. Make sure that you use yield in tasks.", err_msg)
+		end)
+
+		it("throws if resumed outside of a task", function()
+			local t = task.create(function()
+				task.yield()
+			end)
+
+			task.resume(t)
+			local success, err_msg = coroutine.resume(t.thread)
+
+			assert.is.False(success)
+			assert.are.same("coroutine.yield returned without a running task. Make sure that you use task.resume to resume tasks.", err_msg)
 		end)
 
 		it("throws if cancelled", function()
@@ -126,8 +134,8 @@ describe("coop.task", function()
 				task.yield()
 			end)
 
-			t:cancel()
-			local success, err_msg = t:resume()
+			t:resume()
+			local success, err_msg = t:cancel()
 
 			assert.is.False(success)
 			assert.are.same("cancelled", err_msg)

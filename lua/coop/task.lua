@@ -16,8 +16,8 @@ local pack = require("coop.table-utils").pack
 ---@field future Future the future for the coroutine
 ---@field cancelled boolean true if the user has requested cancellation
 ---
----@field cancel fun(Task) cancels the task
----@field resume fun(Task, ...) resumes the task
+---@field cancel fun(Task): boolean, ... cancels the task
+---@field resume fun(Task, ...): boolean, ... resumes the task
 ---@field status fun(Task): string returns the task’s status
 ---
 ---@field await function awaits the task
@@ -83,13 +83,18 @@ end
 ---
 --- The cancelled task will throw `error("cancelled")` in its yield.
 ---
+--- `cancel` resumes the task. It’s like sending a cancellation signal that the task needs to
+--- handle.
+---
 ---@param task Task the task to cancel
+---@return boolean success
+---@return any ... results
 M.cancel = function(task)
 	local task_status = M.status(task)
 
 	if task_status == "dead" then
 		-- The task is already dead (finished). Don’t do anything.
-		return
+		return false, "dead"
 	end
 
 	if task_status == "running" or task_status == "normal" then
@@ -99,7 +104,7 @@ M.cancel = function(task)
 	assert(task_status == "suspended")
 
 	task.cancelled = true
-	task:resume()
+	return task:resume()
 end
 
 --- Returns the currently running task or nil.
@@ -135,9 +140,19 @@ end
 ---@return boolean success true iff the task was not cancelled
 ---@return any ... the arguments passed to task.resume or "cancelled"
 M.pyield = function(...)
+	local this = M.running()
+
+	if not this then
+		error("Called pyield outside of a running task. Make sure that you use yield in tasks.", 0)
+	end
+
+	if this.cancelled then
+		error("Called pyield inside a cancelled task.", 0)
+	end
+
 	local args = pack(coroutine.yield(...))
 
-	local this = M.running()
+	this = M.running()
 
 	if not this then
 		error(

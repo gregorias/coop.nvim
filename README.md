@@ -142,7 +142,7 @@ task.create
 ---@param task Task
 ---@param ...
 ---@return boolean success
----@return ...
+---@return any ... results
 task.resume
 
 --- Yields from a task functions it’s in.
@@ -180,7 +180,12 @@ A cancel function (which is also a method):
 ---
 --- The cancelled task will throw `error("cancelled")` in its yield.
 ---
+--- `cancel` resumes the task. It’s like sending a cancellation signal that the task needs to
+--- handle.
+---
 ---@param task Task the task to cancel
+---@return boolean success
+---@return any ... results
 function task.cancel(task)
   -- …
 end
