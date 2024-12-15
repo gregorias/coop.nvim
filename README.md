@@ -255,6 +255,11 @@ The essential task-related functions live in `coop.task` and `coop.task-utils` m
 
 ## 📙 Library reference
 
+### `coop.control`
+
+[The `coop.control` module](https://github.com/gregorias/coop.nvim/blob/main/lua/coop/control.lua)
+provides utilities for combining task functions and awaitables.
+
 ### `coop.lsp.client`
 
 [The `coop.lsp.client` module](https://github.com/gregorias/coop.nvim/blob/main/lua/coop/lsp/client.lua)
