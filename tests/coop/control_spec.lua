@@ -1,5 +1,8 @@
 --- Busted tests for coop.control
 local coop = require("coop")
+local task = require("coop.task")
+local spawn = coop.spawn
+local copcall = coop.copcall
 local control = require("coop.control")
 local sleep = require("coop.uv-utils").sleep
 
@@ -41,6 +44,88 @@ describe("coop.control", function()
 			assert.has.error(function()
 				gather_t:await(100, 1)
 			end, "foo")
+		end)
+	end)
+
+	describe("shield", function()
+		local shield = control.shield
+		it("throws outside task", function()
+			assert.has.error(function()
+				shield(function() end)
+			end, "shield can only be used in a task.")
+		end)
+
+		it("executes wrapped function", function()
+			local t = spawn(function()
+				return shield(function()
+					return "foo"
+				end)
+			end)
+			assert.are.same("foo", t:await(10, 1))
+		end)
+
+		it("rethrows errors from wrapped function", function()
+			local t = spawn(function()
+				shield(function()
+					error("foo")
+				end)
+			end)
+
+			assert.has.error(function()
+				t:await(10, 1)
+			end, "foo")
+		end)
+
+		it("protects from cancellation but still throws", function()
+			---@type Task
+			local internal_task = nil
+			local internal_task_done = false
+			local t = spawn(function()
+				shield(function()
+					---@diagnostic disable-next-line: cast-local-type
+					internal_task = task.running()
+					-- Yield and wait for resuming.
+					task.yield()
+					internal_task_done = true
+				end)
+			end)
+			t:cancel()
+			assert.is.False(internal_task_done)
+
+			internal_task:resume()
+			assert.is.True(internal_task_done)
+
+			assert.has.error(function()
+				t:await(100, 1)
+			end, "cancelled")
+		end)
+
+		it("completely ignores cancellation with copcall", function()
+			---@type Task
+			local internal_task = nil
+			local internal_task_done = false
+			local t = spawn(function()
+				local success, result = copcall(shield, function()
+					---@diagnostic disable-next-line: cast-local-type
+					internal_task = task.running()
+					-- Yield and wait for resuming.
+					task.yield()
+					internal_task_done = true
+				end)
+				assert.is.False(success)
+				assert.are.same({ false, "cancelled" }, { success, result })
+
+				assert.is.True(task.running():is_cancelled())
+				task.running():unset_cancelled()
+				return "foo"
+			end)
+			t:cancel()
+			assert.is.False(internal_task_done)
+
+			internal_task:resume()
+			assert.is.True(internal_task_done)
+
+			assert.are.same("foo", t:await(100, 1))
 		end)
 	end)
 

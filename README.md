@@ -279,6 +279,23 @@ provides utilities for combining task functions and awaitables.
 ---@param tasks Task[] the list of tasks.
 ---@return any ... results
 M.gather = function(tasks) end
+
+--- Protects a task function from being cancelled.
+---
+--- The task function is executed in a new task.
+---
+--- If not cancellation is taking place, `shield(tf, ...)` is equivelent to `tf(...)`.
+---
+--- If the task wrapping `shield` is cancelled, the task function is allowed to complete.
+--- Afterwards `shield` throws the cancellation error.
+---
+--- If it is desired to completely ignore cancellation, `shield` should be combined with `copcall`.
+---
+---@async
+---@param tf async function The task function to protect.
+---@param ... ... The arguments to pass to the task function.
+---@return any ... The results of the task function.
+M.shield = function(tf, ...) end
 ```
 
 </details>

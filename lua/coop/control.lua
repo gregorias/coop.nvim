@@ -63,6 +63,65 @@ M.gather = function(tasks)
 	end
 end
 
+-- `shield` can’t be implemented with `copcall`, because if a cancellation error
+-- happens withing `copcall`, the error still finishes the wrapped function.
+-- The only solution is to wrap the task function in a new task, so that
+-- cancellation requests don’t reach the wrapped function.
+
+--- Protects a task function from being cancelled.
+---
+--- The task function is executed in a new task.
+---
+--- If not cancellation is taking place, `shield(tf, ...)` is equivelent to `tf(...)`.
+---
+--- If the task wrapping `shield` is cancelled, the task function is allowed to complete.
+--- Afterwards `shield` throws the cancellation error.
+---
+--- If it is desired to completely ignore cancellation, `shield` should be combined with `copcall`.
+---
+---@async
+---@param tf async function The task function to protect.
+---@param ... ... The arguments to pass to the task function.
+---@return any ... The results of the task function.
+M.shield = function(tf, ...)
+	local spawn = require("coop.task-utils").spawn
+	local pack = require("coop.table-utils").pack
+
+	local this = task.running()
+	if this == nil then
+		error("shield can only be used in a task.")
+	end
+
+	local cancelled = false
+	local cancel_msg = ""
+	local t = spawn(tf, ...)
+	local results = pack()
+	while true do
+		results = pack(t:pawait())
+
+		if results[1] then
+			break
+		end
+
+		if this:is_cancelled() then
+			this:unset_cancelled()
+			cancelled = true
+			cancel_msg = results[2]
+		else
+			break
+		end
+	end
+
+	if cancelled then
+		this.cancelled = true
+		error(cancel_msg, 0)
+	elseif results[1] then
+		return unpack(results, 2, results.n)
+	else
+		error(results[2], 0)
+	end
+end
+
 --- Waits for any of the given awaitables to complete.
 ---
 ---@async
