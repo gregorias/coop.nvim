@@ -14,11 +14,14 @@ local pack = require("coop.table-utils").pack
 ---@class Task
 ---@field thread thread the coroutine thread
 ---@field future Future the future for the coroutine
----@field cancelled boolean true if the user has requested cancellation
+---
+---@field status fun(Task): string returns the task’s status
+---@field resume fun(Task, ...): boolean, ... resumes the task
 ---
 ---@field cancel fun(Task): boolean, ... cancels the task
----@field resume fun(Task, ...): boolean, ... resumes the task
----@field status fun(Task): string returns the task’s status
+---@field cancelled boolean true if the user has requested cancellation
+---@field is_cancelled fun(Task): boolean returns true if the task is cancelled
+---@field unset_cancelled fun(Task) unsets the cancelled flag
 ---
 ---@field await function awaits the task
 
@@ -46,6 +49,13 @@ M.create = function(tf)
 
 			await = function(self, ...)
 				return self.future:await(...)
+			end,
+
+			is_cancelled = function(self)
+				return self.cancelled
+			end,
+			unset_cancelled = function(self)
+				self.cancelled = false
 			end,
 		},
 		__call = function(self, ...)
@@ -82,6 +92,8 @@ end
 --- Cancels a task.
 ---
 --- The cancelled task will throw `error("cancelled")` in its yield.
+--- If you intercept cancellation, you need to unset the `cancelled` flag with with
+--- Task:unset_cancelled.
 ---
 --- `cancel` resumes the task. It’s like sending a cancellation signal that the task needs to
 --- handle.
@@ -146,8 +158,13 @@ M.pyield = function(...)
 		error("Called pyield outside of a running task. Make sure that you use yield in tasks.", 0)
 	end
 
-	if this.cancelled then
-		error("Called pyield inside a cancelled task.", 0)
+	if this:is_cancelled() then
+		error(
+			"Called pyield inside a cancelled task."
+				.. " If you want to intercept cancellation,"
+				.. " you need to clear the cancellation flag with unset_cancelled.",
+			0
+		)
 	end
 
 	local args = pack(coroutine.yield(...))
@@ -162,8 +179,6 @@ M.pyield = function(...)
 	end
 
 	if this.cancelled then
-		-- Clear the cancelled flag, so that the user can ignore it.
-		this.cancelled = false
 		return false, "cancelled"
 	end
 

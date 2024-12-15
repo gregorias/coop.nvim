@@ -34,21 +34,26 @@ describe("coop.mpsc-queue", function()
 	end)
 
 	it("handles cancellation but continues working", function()
+		local task = require("coop.task")
+
 		local q = mpsc_queue.MpscQueue.new()
 
-		local task = coop.spawn(function()
-			local _, error = coop.copcall(function()
+		local qtask = coop.spawn(function()
+			local running, error = coop.copcall(function()
 				return q:pop()
 			end)
+			if not running and task.running():is_cancelled() then
+				task.running():unset_cancelled()
+			end
 
 			return error, q:pop(), q:pop()
 		end)
 
-		task:cancel()
+		qtask:cancel()
 		q:push(1)
 		q:push(2)
 
-		local error, first, second = task:await(50, 1)
+		local error, first, second = qtask:await(50, 1)
 
 		assert.are.same("cancelled", error)
 		assert.are.same(1, first)

@@ -16,14 +16,18 @@ describe("coop.task", function()
 			-- Immediately cancel the task.
 			spawned_task:cancel()
 
-			spawned_task:await(function (success, result)
+			spawned_task:await(function(success, result)
 				assert.are.same("dead", spawned_task:status())
 				assert.is.False(success)
 				assert.are.same("cancelled", result)
 			end)
 
+			-- Wait to see if the task sets the done flag. It shouldn’t.
+			vim.wait(40)
+
 			-- Test that the task didn’t finish.
 			assert.is.False(done)
+			assert.is.True(spawned_task:is_cancelled())
 			assert.are.same("dead", spawned_task:status())
 		end)
 
@@ -41,9 +45,12 @@ describe("coop.task", function()
 			assert.are.same("cancelled", err_msg)
 		end)
 
-		it("can uncancelled by user", function()
+		it("can be uncancelled by user", function()
 			local spawned_task = coop.spawn(function()
-				copcall(sleep, 20)
+				local success = copcall(sleep, 20)
+				if not success and task.running():is_cancelled() then
+					task.running():unset_cancelled()
+				end
 				return "done"
 			end)
 
@@ -60,6 +67,25 @@ describe("coop.task", function()
 			local spawned_task = coop.spawn(function() end)
 			spawned_task:cancel()
 			assert.is.False(spawned_task.cancelled)
+		end)
+
+		it("causes yield to throw an error after interception", function()
+			local t = coop.spawn(function()
+				local running, err_msg = task.pyield()
+				assert.is.False(running)
+				assert.are.same("cancelled", err_msg)
+
+				local _, msg = pcall(task.pyield)
+				return msg
+			end)
+			local success, result = t:cancel()
+			assert.is.True(success)
+			assert.are.same(
+				"Called pyield inside a cancelled task."
+					.. " If you want to intercept cancellation,"
+					.. " you need to clear the cancellation flag with unset_cancelled.",
+				result
+			)
 		end)
 
 		it("throws an error if called within a running task", function()
@@ -114,7 +140,10 @@ describe("coop.task", function()
 			local success, err_msg = coroutine.resume(t.thread)
 
 			assert.is.False(success)
-			assert.are.same("Called pyield outside of a running task. Make sure that you use yield in tasks.", err_msg)
+			assert.are.same(
+				"Called pyield outside of a running task. Make sure that you use yield in tasks.",
+				err_msg
+			)
 		end)
 
 		it("throws if resumed outside of a task", function()
@@ -126,7 +155,10 @@ describe("coop.task", function()
 			local success, err_msg = coroutine.resume(t.thread)
 
 			assert.is.False(success)
-			assert.are.same("coroutine.yield returned without a running task. Make sure that you use task.resume to resume tasks.", err_msg)
+			assert.are.same(
+				"coroutine.yield returned without a running task. Make sure that you use task.resume to resume tasks.",
+				err_msg
+			)
 		end)
 
 		it("throws if cancelled", function()

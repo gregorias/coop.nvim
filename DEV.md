@@ -93,6 +93,21 @@ This is inline with the design goal to avoid asynchronous boilerplate.
 
 `await` rethrows errors. This makes `await` behave like a regular function would.
 
+### `Task:cancel` sets `cancelled` flag
+
+I decided that `Task:cancel` sets a `cancelled` flag that, if intercepted,
+needs to be cleared by the programmer.
+
+This makes the cancellation interface more flexible:
+
+1. The programmer can intercept cancellation, do some clean up logic, and still
+   proceed with cancellation.
+2. The programmer can now more reliably check which task was cancelled.
+   This is particularly necessary during `Task:await`.
+   When the programmer runs `task:await()`, it may throw `error('cancelled')`, but,
+   without the `cancelled` flag, it’s unclear whether it comes from `task` or
+   the running task.
+
 [Commitlint]: https://github.com/conventional-changelog/commitlint
 [Lefthook]: https://github.com/evilmartians/lefthook
 [Just]: https://just.systems/

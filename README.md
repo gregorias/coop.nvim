@@ -179,6 +179,8 @@ A cancel function (which is also a method):
 --- Cancels the task.
 ---
 --- The cancelled task will throw `error("cancelled")` in its yield.
+--- If you intercept cancellation, you need to unset the `cancelled` flag with
+--- with Task:unset_cancelled.
 ---
 --- `cancel` resumes the task. It’s like sending a cancellation signal that the task needs to
 --- handle.
@@ -187,6 +189,21 @@ A cancel function (which is also a method):
 ---@return boolean success
 ---@return any ... results
 function task.cancel(task)
+  -- …
+end
+
+--- Unsets the cancellation flag.
+---
+---@param task Task
+function task.unset_cancelled(task)
+  -- …
+end
+
+--- Returns whether the task is cancelled.
+---
+---@param task Task
+---@return boolean is_cancelled
+function task.is_cancelled(task)
   -- …
 end
 ```
