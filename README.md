@@ -208,7 +208,7 @@ function task.is_cancelled(task)
 end
 ```
 
-And an await method that has three variants:
+And an await method that has three overload and a protected variant.
 
 ```lua
 -- Awaits task completion.
@@ -227,6 +227,19 @@ task:await(function(success, result) end)
 -- task.await(timeout, interval) is a blocking function that uses vim.wait to
 -- implement a busy-waiting loop.
 task:await(1000, 100) -- Wait for 1s for the task to finish. Check every 100ms
+
+--- Awaits task completion in a protected mode.
+---
+--- This variant of await doesn’t rethrow errors.
+--- Instead it returns false, err_msg.
+---
+---@async
+---@param self Task
+---@return boolean success
+---@return any ... results
+function task.pawait(self)
+  -- …
+end
 ```
 
 Tasks implement a call operator that calls `await`. This allows for a fluent

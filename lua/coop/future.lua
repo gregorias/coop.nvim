@@ -2,6 +2,7 @@
 local M = {}
 
 local pack = require("coop.table-utils").pack
+local unpack_packed = require("coop.table-utils").unpack_packed
 
 --- A future is a synchronization mechanism that allows waiting for a task to return.
 ---
@@ -18,6 +19,7 @@ local pack = require("coop.table-utils").pack
 ---                      waiting queue.
 ---
 ---@field await function Waits for the future to be done.
+---@field pawait async fun(Future): boolean, ... Waits for the future to be done.
 M.Future = {}
 
 --- Creates a new future.
@@ -84,32 +86,30 @@ M.Future.await = function(self, cb_or_timeout, interval)
 	end
 end
 
+--- Waits for the future to be done.
+---
+---@param self Future the future
+---@return boolean success whether the future was successful and the pawait was not cancelled.
+---@return any ... the results of the task function or an error message.
+M.Future.pawait = function(self)
+	return self:pawait_tf()
+end
+
 --- Asynchronously waits for the future to be done.
 ---
 --- This is a task function that yields until the future is done.
+---
+--- Rethrows the error if the future ended with an error or the await was cancelled.
 ---
 ---@async
 ---@param self Future the future
 ---@return any ... the results of the task function
 M.Future.await_tf = function(self)
-	if not self.done then
-		local task = require("coop.task")
-		local this = task.running()
-		if this == nil then
-			error("Future.await can only be used in a task.")
-		end
-
-		table.insert(self.queue, function(...)
-			task.resume(this, ...)
-		end)
-
-		task.yield()
-	end
-
-	if self.results[1] then
-		return unpack(self.results, 2, self.results.n)
+	local results = pack(self:pawait_tf())
+	if results[1] then
+		return unpack(results, 2, results.n)
 	else
-		error(self.results[2], 0)
+		error(results[2], 0)
 	end
 end
 
@@ -151,6 +151,38 @@ M.Future.wait = function(self, timeout, interval)
 	else
 		return
 	end
+end
+
+--- Asynchronously waits for the future to be done.
+---
+--- This is a task function that yields until the future is done.
+---
+---@async
+---@param self Future the future
+---@return boolean success whether the future was successful and the await was not cancelled.
+---@return any ... the results of the task function or an error message.
+M.Future.pawait_tf = function(self)
+	local running, yield_msg = true, ""
+	if not self.done then
+		local task = require("coop.task")
+		local this = task.running()
+		if this == nil then
+			error("Future.pawait can only be used in a task.", 2)
+		end
+
+		table.insert(self.queue, function()
+			task.resume(this)
+		end)
+
+		running, yield_msg = task.pyield()
+	end
+
+	-- The await was cancelled.
+	if not running then
+		return false, yield_msg
+	end
+
+	return unpack_packed(self.results)
 end
 
 return M

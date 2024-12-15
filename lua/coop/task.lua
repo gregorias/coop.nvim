@@ -24,6 +24,7 @@ local pack = require("coop.table-utils").pack
 ---@field unset_cancelled fun(Task) unsets the cancelled flag
 ---
 ---@field await function awaits the task
+---@field pawait async fun(Task): boolean, ... awaits the task and returns errors
 
 local running_task = nil
 
@@ -49,6 +50,9 @@ M.create = function(tf)
 
 			await = function(self, ...)
 				return self.future:await(...)
+			end,
+			pawait = function(self)
+				return self.future:pawait()
 			end,
 
 			is_cancelled = function(self)
