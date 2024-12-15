@@ -72,7 +72,7 @@ end
 ---
 --- The task function is executed in a new task.
 ---
---- If not cancellation is taking place, `shield(tf, ...)` is equivelent to `tf(...)`.
+--- If no cancellation is taking place, `shield(tf, ...)` is equivalent to `tf(...)`.
 ---
 --- If the task wrapping `shield` is cancelled, the task function is allowed to complete.
 --- Afterwards `shield` throws the cancellation error.
@@ -118,6 +118,56 @@ M.shield = function(tf, ...)
 	elseif results[1] then
 		return unpack(results, 2, results.n)
 	else
+		error(results[2], 0)
+	end
+end
+
+--- Creates a task function that times out after the given duration.
+---
+--- If no timeout is taking place, `timeout(duration, tf, ...)` is equivalent to `tf(...)`.
+---
+--- If a timeout happens, `timeout` throws `error("timeout")`.
+---
+--- If the returned task function is cancelled, so is the wrapped task function.
+---
+---@async
+---@param duration integer The duration in milliseconds.
+---@param tf async function The task function to run.
+---@param ... ... The arguments to pass to the task function.
+---@return ... ... The results of the task function.
+M.timeout = function(duration, tf, ...)
+	local spawn = require("coop.task-utils").spawn
+	local sleep = require("coop.uv-utils").sleep
+	local pack = require("coop.table-utils").pack
+
+	local t = spawn(tf, ...)
+	local timed_out = false
+
+	-- Start the watchdog.
+	spawn(function()
+		sleep(duration)
+		if t:status() ~= "dead" then
+			timed_out = true
+			t:cancel()
+		end
+	end)
+
+	local results = pack(t:pawait())
+
+	if t:status() == "dead" then
+		if results[1] then
+			return unpack(results, 2, results.n)
+		elseif timed_out == true then
+			error("timeout", 0)
+		else
+			error(results[2], 0)
+		end
+	else
+		assert(
+			task.running():is_cancelled(),
+			"timeout encountered an invalid state. Report to Coop.nvim maintainer."
+		)
+		t:cancel()
 		error(results[2], 0)
 	end
 end

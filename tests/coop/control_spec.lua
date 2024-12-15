@@ -129,6 +129,63 @@ describe("coop.control", function()
 		end)
 	end)
 
+	describe("timeout", function()
+		local timeout = control.timeout
+
+		it("works normally with a task that finishes in time", function()
+			local t = spawn(function()
+				return timeout(100, function()
+					return "foo", "bar"
+				end)
+			end)
+			assert.are.same({ "foo", "bar" }, { t:await(100, 1) })
+		end)
+
+		it("rethrows errors from wrapped function", function()
+			local t = spawn(function()
+				timeout(100, function()
+					error("foo")
+				end)
+			end)
+
+			assert.has.error(function()
+				t:await(10, 1)
+			end, "foo")
+		end)
+
+		it("cancels overrunning task functions", function()
+			local got_cancelled = false
+			local t = spawn(function()
+				return timeout(5, function()
+					local _, err = copcall(sleep, 10)
+					got_cancelled = err == "cancelled"
+					error(err)
+				end)
+			end)
+
+			assert.has.error(function()
+				t:await(100, 1)
+			end, "timeout")
+
+			assert.is.True(got_cancelled)
+		end)
+
+		it("cancels subtask on cancellation", function()
+			local got_cancelled = false
+			local t = spawn(function()
+				return timeout(1000, function()
+					local _, err = copcall(sleep, 2000)
+					got_cancelled = err == "cancelled"
+					error(err)
+				end)
+			end)
+			local success, results = t:cancel()
+
+			assert.are.same({ false, "cancelled" }, { success, results })
+			assert.is.True(got_cancelled)
+		end)
+	end)
+
 	describe("await_any", function()
 		it("throws on empty list", function()
 			assert.has.error(function()

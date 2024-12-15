@@ -284,7 +284,7 @@ M.gather = function(tasks) end
 ---
 --- The task function is executed in a new task.
 ---
---- If not cancellation is taking place, `shield(tf, ...)` is equivelent to `tf(...)`.
+--- If no cancellation is taking place, `shield(tf, ...)` is equivalent to `tf(...)`.
 ---
 --- If the task wrapping `shield` is cancelled, the task function is allowed to complete.
 --- Afterwards `shield` throws the cancellation error.
@@ -296,6 +296,21 @@ M.gather = function(tasks) end
 ---@param ... ... The arguments to pass to the task function.
 ---@return any ... The results of the task function.
 M.shield = function(tf, ...) end
+
+--- Creates a task function that times out after the given duration.
+---
+--- If no timeout is taking place, `timeout(duration, tf, ...)` is equivalent to `tf(...)`.
+---
+--- If a timeout happens, `timeout` throws `error("timeout")`.
+---
+--- If the returned task function is cancelled, so is the wrapped task function.
+---
+---@async
+---@param duration integer The duration in milliseconds.
+---@param tf async function The task function to run.
+---@param ... ... The arguments to pass to the task function.
+---@return ... ... The results of the task function.
+M.timeout = function(duration, tf, ...) end
 ```
 
 </details>
