@@ -311,6 +311,27 @@ M.shield = function(tf, ...) end
 ---@param ... ... The arguments to pass to the task function.
 ---@return ... ... The results of the task function.
 M.timeout = function(duration, tf, ...) end
+
+--- Waits for any of the given tasks to complete.
+---
+---@async
+---@param tasks Task[]
+---@return Task done The first task that completed.
+---@return Task[] done The remaining tasks.
+M.await_any = function(tasks) end
+
+--- Awaits all tasks in the list.
+---
+---@async
+---@param tasks Task[]
+---@return table results The results of the tasks.
+M.await_all = function(tasks) end
+
+--- Asynchronously iterates over the given awaitables and waits for each to complete.
+---
+---@async
+---@param tasks tasks[]
+M.as_completed = function(tasks) end
 ```
 
 </details>

@@ -201,8 +201,6 @@ end
 
 --- Awaits all awaitables in the list.
 ---
---- This is a task function.
----
 ---@async
 ---@param aws Awaitable[]
 ---@return table results The results of the awaitables.
