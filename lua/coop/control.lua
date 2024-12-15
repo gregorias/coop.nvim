@@ -6,6 +6,63 @@ local Future = require("coop.future").Future
 
 ---@alias Awaitable Future|Task
 
+--- Runs tasks in the sequence concurrently.
+---
+--- If all tasks are completed successfully, the result is an aggregate list of returned
+--- values. The order of result values corresponds to the order of tasks.
+---
+--- The first raised exception is immediately propagated to the task that awaits on gather().
+--- Active tasks in the sequence won’t be cancelled and will continue to run.
+---
+--- Cancelling the gather will cancel all tasks in the sequence.
+---
+---@async
+---@param tasks Task[] the list of tasks.
+---@return any ... results
+M.gather = function(tasks)
+	local task_count = #tasks
+	if task_count == 0 then
+		return {}
+	end
+
+	local replicate = require("coop.table-utils").replicate
+	local results = replicate(task_count, nil)
+	local future = Future.new()
+	local done_count = 0
+
+	for i, aw in ipairs(tasks) do
+		aw:await(function(success, result, ...)
+			tasks[i] = nil
+
+			if success then
+				results[i] = { result, ... }
+			else
+				future:error(result)
+				return
+			end
+
+			done_count = done_count + 1
+			if done_count == task_count then
+				future:complete(results)
+			end
+		end)
+	end
+
+	local success, result = future:pawait()
+	if success then
+		return results
+	else
+		if result == "cancelled" and task.running():is_cancelled() then
+			for _, t in ipairs(tasks) do
+				if t ~= nil then
+					t:cancel()
+				end
+			end
+		end
+		error(result, 0)
+	end
+end
+
 --- Waits for any of the given awaitables to complete.
 ---
 ---@async
