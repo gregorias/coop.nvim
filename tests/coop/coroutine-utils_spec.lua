@@ -81,6 +81,7 @@ describe("coop.coroutine-utils", function()
 	end)
 
 	describe("copcall", function()
+		-- These tests also ensure that copcall work well with task interfaces.
 		it("executes a throwing coroutine function in a protected mode", function()
 			local throw_after_sleep = function()
 				sleep(2)
@@ -111,6 +112,24 @@ describe("coop.coroutine-utils", function()
 			assert.are.same("foo", val_foo)
 			assert.is.Nil(val_nil)
 			assert.are.same("bar", val_bar)
+		end)
+
+		it("intercepts task cancellations", function()
+			local return_after_sleep = function()
+				sleep(200)
+				return "foo"
+			end
+			local f_tf = function()
+				return copcall(return_after_sleep)
+			end
+
+			local t = coop.spawn(f_tf)
+			local success, isuccess, err = t:cancel()
+
+			assert.is.True(success)
+			assert.is.True(t:is_cancelled())
+			assert.is.False(isuccess)
+			assert.are.same("cancelled", err)
 		end)
 	end)
 
