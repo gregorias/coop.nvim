@@ -1,5 +1,6 @@
 --- Busted tests for coop.table-utils.
 local coop = require("coop")
+local spawn = coop.spawn
 local copcall = require("coop.coroutine-utils").copcall
 local sleep = require("coop.uv-utils").sleep
 
@@ -66,6 +67,13 @@ describe("coop.future", function()
 			assert.is.True(tsuccess)
 			assert.is.False(pawait_success)
 			assert.are.same("cancelled", err)
+		end)
+
+		it("still works when cancelled but the awaitable continues", function()
+			local future = coop.Future.new()
+			spawn(future.pawait, future):cancel()
+			-- A previous version used to throw an error here, because the listener was not removed.
+			future:complete("foo")
 		end)
 
 		it("throws error if called outside a task", function()

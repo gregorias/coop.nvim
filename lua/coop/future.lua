@@ -171,6 +171,11 @@ M.Future.pawait_tf = function(self)
 		end
 
 		table.insert(self.queue, function()
+			if not running then
+				-- This await was cancelled during yield. There’s nothing to resume.
+				return
+			end
+
 			task.resume(this)
 		end)
 
