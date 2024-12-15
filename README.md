@@ -271,14 +271,14 @@ provides utilities for combining task functions and awaitables.
 --- values. The order of result values corresponds to the order of tasks.
 ---
 --- The first raised exception is immediately propagated to the task that awaits on gather().
---- Other tasks in the sequence won’t be cancelled and will continue to run.
+--- Active tasks in the sequence won’t be cancelled and will continue to run.
 ---
 --- Cancelling the gather will cancel all tasks in the sequence.
 ---
 ---@async
 ---@param tasks Task[] the list of tasks.
 ---@return any ... results
-M.gather = function(tasks)
+M.gather = function(tasks) end
 ```
 
 </details>
