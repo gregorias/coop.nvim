@@ -25,6 +25,22 @@ M.unpack_packed = function(packed)
 	return unpack(packed, 1, packed.n)
 end
 
+--- Replicates a value n times.
+---
+---@param n number
+---@param v any
+---@return table
+M.replicate = function(n, v)
+	if n < 0 then
+		error("Can't replicate a value a negative number of times: " .. n .. ".")
+	end
+	local t = {}
+	for i = 1, n do
+		t[i] = v
+	end
+	return t
+end
+
 --- Safely inserts an element into a list.
 ---
 --- Safe here means that this insert considers nil values in the list.

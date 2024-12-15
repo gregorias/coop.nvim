@@ -2,6 +2,17 @@
 local table_utils = require("coop.table-utils")
 
 describe("coop.table-utils", function()
+	describe("replicate", function()
+		local replicate = table_utils.replicate
+		it("works", function()
+			assert.are.same({}, replicate(0, nil))
+			assert.are.same({ "foo", "foo", "foo" }, replicate(3, "foo"))
+			assert.has.error(function()
+				replicate(-1, "foo")
+			end, "Can't replicate a value a negative number of times: -1.")
+		end)
+	end)
+
 	describe("shift_left", function()
 		it("shifts the elements of a list to the left", function()
 			local t = { 1, 2, 3, 4, 5 }
