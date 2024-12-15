@@ -90,7 +90,7 @@ end
 ---
 ---@async
 ---@param self Future the future
----@return any results the results of the task function
+---@return any ... the results of the task function
 M.Future.await_tf = function(self)
 	if not self.done then
 		local task = require("coop.task")
@@ -129,7 +129,7 @@ M.Future.await_cb = function(self, cb)
 	end
 end
 
---- Synchronously wait for the future to be done.
+--- Synchronously waits for the future to be done.
 ---
 --- This function uses busy waiting to wait for the future to be done.
 ---
@@ -137,7 +137,7 @@ end
 ---
 ---@param timeout number The timeout in milliseconds.
 ---@param interval number The interval in milliseconds between checks.
----@return any results The results of the coroutine function if done.
+---@return any ... The results of the coroutine function if done.
 M.Future.wait = function(self, timeout, interval)
 	vim.wait(timeout, function()
 		return self.done
