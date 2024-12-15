@@ -62,11 +62,12 @@ end
 ---
 --- This is also a coroutine function.
 ---
---- Interestingly, this also works with task functions as it just forwards communication that
---- happens between resumes and yields.
----
 --- copcall is a coroutine alternative to pcall. pcall is not suitable for coroutines, because
 --- yields can’t cross a pcall. copcall goes around that restriction by using coroutine.resume.
+---
+--- Interestingly, this also works with task functions as it just forwards communication that
+--- happens between resumes and yields. In fact, it is THE way to run pcall with tasks,
+--- because it doesn’t change the running task: the wrapped function executes in the same task.
 ---
 ---@async
 ---@param f_co async function A coroutine function to execute.
