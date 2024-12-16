@@ -427,6 +427,11 @@ provides the following:
 - `StreamReader` and `StreamWriter`, two wrappers that turn callback-based
   Libuv streams (`uv_stream_t`) into objects with asynchronous task functions.
 
+### `coop.vim`
+
+[The `vim` module](https://github.com/gregorias/coop.nvim/blob/main/lua/coop/vim.lua)
+provide the task function version `vim.system`.
+
 <details>
 
 <summary>Stream example</summary>
