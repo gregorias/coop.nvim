@@ -353,7 +353,7 @@ queue with an asynchronous `pop` method.
 <summary>Code example</summary>
 
 ```lua
-local MpscQueue = require('coop.mpsc_queue').MpscQueue
+local MpscQueue = require('coop.mpsc-queue').MpscQueue
 local q = MpscQueue.new()
 
 -- Asynchronously print whatever is provided to q.
