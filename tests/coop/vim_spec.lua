@@ -3,7 +3,7 @@ local coop = require("coop")
 
 describe("coop.vim", function()
 	describe("system", function()
-		system = require("coop.vim").system
+		local system = require("coop.vim").system
 
 		it("executes cat", function()
 			local results = coop.spawn(system, { "cat", "selene.toml" }):await(100, 1)
