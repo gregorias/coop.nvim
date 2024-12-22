@@ -40,6 +40,9 @@ globals:
   assert.is.Nil:
     args:
       - type: any
+  assert.is.Not.Nil:
+    args:
+      - type: any
   before_each:
     args:
       - type: function
