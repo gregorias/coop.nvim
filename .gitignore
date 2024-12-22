@@ -5,3 +5,7 @@ luacov.stats.out
 luacov-html
 luacov.report.html
 luacov.report.out
+
+# LuaRocks
+
+*.src.rock
