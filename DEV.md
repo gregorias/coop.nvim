@@ -17,6 +17,22 @@ Install lefthook:
 lefthook install
 ```
 
+## Ops
+
+### LuaRocks release
+
+To release a new version to LuaRocks, do the following:
+
+1. If you’ve changed available source files, update the `build.modules` field
+   in the Rockspec file.
+2. Update the `version` field in the Rockspec file.
+3. Update the name of the Rockspec file to reflect the new version.
+4. Upload a rock with the following command:
+
+```shell
+luarocks upload ./coop.nvim-$VERSION-$REVISION.rockspec --api_key=$API_KEY
+```
+
 ## Glossary
 
 A **coroutine function** is a Lua function, which may call `coroutine.yield`.

@@ -44,6 +44,12 @@ Install the plugin with your preferred package manager, such as [Lazy]:
 }
 ```
 
+or [Rocks]:
+
+```plaintext
+:Rocks install coop.nvim
+```
+
 ## 🚀 Usage tutorial
 
 This section is a Coop tutorial by example.
@@ -526,3 +532,4 @@ The SVG from the logo comes from
 [Lazy]: https://github.com/folke/lazy.nvim
 [Nio]: https://github.com/nvim-neotest/nvim-nio
 [Neovim UV]: https://neovim.io/doc/user/luvref.html
+[Rocks]: https://github.com/nvim-neorocks/rocks.nvim
