@@ -7,7 +7,7 @@ M.STREAM = "stream"
 ---@alias signum integer|string|nil
 
 ---@class Process
----@field handle uv_process_t The handle to the process.
+---@field handle uv.uv_process_t The handle to the process.
 ---@field pid integer The process ID.
 ---@field stdin any The stdin of the process.
 ---@field stdout any The stdout of the process.

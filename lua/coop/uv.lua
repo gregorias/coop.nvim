@@ -10,29 +10,6 @@ local coop = require("coop")
 
 ---@alias buffer string|string[]
 
----@alias uv_req_t uv_fs_t|uv_shutdown_t
----@class uv_fs_t
----@class uv_shutdown_t
-
--- https://neovim.io/doc/user/luvref.html#luv-contents
-
----@alias uv_handle_t uv_timer_t|uv_prepare_t|uv_check_t|uv_idle_t|uv_async_t|uv_poll_t|uv_signal_t|uv_process_t|uv_stream_t|uv_udp_t|uv_fs_event_t|uv_fs_pool_t
----@class uv_timer_t userdata
----@class uv_prepare_t userdata
----@class uv_check_t userdata
----@class uv_idle_t userdata
----@class uv_async_t userdata
----@class uv_poll_t userdata
----@class uv_signal_t userdata
----@class uv_process_t userdata
----@alias uv_stream_t uv_tcp_t|uv_pipe_t|uv_tty_t|userdata
----@class uv_tcp_t userdata
----@class uv_pipe_t userdata
----@class uv_tty_t userdata
----@class uv_udp_t userdata
----@alias uv_fs_event_t userdata
----@alias uv_fs_pool_t userdata
-
 --- Wraps the callback param with `vim.schedule_wrap`.
 ---
 --- This is useful for Libuv functions to ensure that their continuations can run `vim.api` functions without problems.
@@ -71,7 +48,7 @@ end
 --- https://neovim.io/doc/user/luvref.html#uv.close()
 ---
 ---@async
----@param handle uv_handle_t
+---@param handle uv.uv_handle_t
 M.close = function(handle)
 	return wrap(vim.uv.close)(handle)
 end
@@ -79,7 +56,7 @@ end
 --- https://neovim.io/doc/user/luvref.html#uv.timer_start()
 ---
 ---@async
----@param timer uv_timer_t
+---@param timer uv.uv_timer_t
 ---@param timeout integer
 ---@return integer? zero_or_fail
 ---@return string? err
@@ -104,7 +81,7 @@ end
 ---
 ---@param path string The path to the executable.
 ---@param options table
----@return uv_process_t handle
+---@return uv.uv_process_t handle
 ---@return integer pid
 ---@return Future future The future for the exit code and signal.
 M.spawn = function(path, options)
@@ -120,7 +97,7 @@ end
 --- https://neovim.io/doc/user/luvref.html#uv.shutdown()
 ---
 ---@async
----@param stream uv_stream_t
+---@param stream uv.uv_stream_t
 ---@return string? err
 ---@return string? err_name
 M.shutdown = function(stream)
@@ -144,7 +121,7 @@ end
 --- https://neovim.io/doc/user/luvref.html#uv.write()
 ---
 ---@async
----@param stream uv_stream_t
+---@param stream uv.uv_stream_t
 ---@param data buffer
 ---@return string? err
 ---@return string? err_name
@@ -260,7 +237,7 @@ end
 ---@async
 ---@param path string
 ---@return string? err
----@return uv_fs_t? success
+---@return uv.uv_fs_t? success
 M.fs_scandir = function(path)
 	return wrap(vim.uv.fs_scandir)(path)
 end
@@ -452,7 +429,7 @@ end
 ---@param path string
 ---@param entries? integer
 ---@return string? err
----@return luv_dir_t? dir
+---@return uv.luv_dir_t? dir
 M.fs_opendir = function(path, entries)
 	return wrap(vim.uv.fs_opendir, {
 		cleanup = function(err, dir)
@@ -466,7 +443,7 @@ end
 --- https://neovim.io/doc/user/luvref.html#uv.fs_readdir()
 ---
 ---@async
----@param dir luv_dir_t
+---@param dir uv.luv_dir_t
 ---@return string? err
 ---@return table? entries
 M.fs_readdir = function(dir)
@@ -476,7 +453,7 @@ end
 --- https://neovim.io/doc/user/luvref.html#uv.fs_closedir()
 ---
 ---@async
----@param dir luv_dir_t
+---@param dir uv.luv_dir_t
 ---@return string? err
 ---@return boolean? success
 M.fs_closedir = function(dir)
