@@ -4,8 +4,8 @@ local M = {}
 local pack = require("coop.table-utils").pack
 local task = require("coop.task")
 
----@class CbToTfOpts
----@field on_cancel? fun(table, table) The function to call when the task is cancelled.
+---@class Coop.CbToTfOpts
+---@field on_cancel? fun(args: table, ret: table) The function to call when the task is cancelled.
 ---                                    This can be used to stop allocation of resources.
 ---                                    This function receives packed tables with the original call’s arguments and
 ---                                    the immediately returned values (useful if the function returns a cancellable
@@ -30,7 +30,7 @@ end
 --- the user needs options to handle the eventual cleanup.
 ---
 ---@param f function The function to convert. The callback needs to be its first argument.
----@param opts? CbToTfOpts The clean up options.
+---@param opts? Coop.CbToTfOpts The clean up options.
 ---@return async function tf A task function. Accepts the same arguments as f without the callback.
 ---                          Returns what f has passed to the callback.
 M.cb_to_tf = function(f, opts)
@@ -82,7 +82,7 @@ end
 --- spawn(f_co, ...)() is semantically the same as f_co(...)
 ---
 ---@param f_co function The task function to spawn.
----@return Task task the spawned task
+---@return Coop.Task task the spawned task
 M.spawn = function(f_co, ...)
 	local spawned_task = task.create(f_co)
 	task.resume(spawned_task, ...)

@@ -6,17 +6,17 @@ M.STREAM = "stream"
 
 ---@alias signum integer|string|nil
 
----@class Process
+---@class Coop.Process
 ---@field handle uv.uv_process_t The handle to the process.
 ---@field pid integer The process ID.
----@field stdin uv.uv_pipe_t | StreamWriter The stdin of the process.
----@field stdout uv.uv_pipe_t | StreamReader The stdout of the process.
----@field stderr uv.uv_pipe_t | StreamReader The stderr of the process.
+---@field stdin uv.uv_pipe_t | Coop.StreamWriter The stdin of the process.
+---@field stdout uv.uv_pipe_t | Coop.StreamReader The stdout of the process.
+---@field stderr uv.uv_pipe_t | Coop.StreamReader The stderr of the process.
 ---
 ---@field await async function Waits for the process to finish.
----@field kill fun(self: Process, signal: signum) Kills the process. Returns 0 or fail.
+---@field kill fun(self: Coop.Process, signal: signum) Kills the process. Returns 0 or fail.
 
----@class SpawnOptions
+---@class Coop.SpawnOptions
 ---@field args? table The arguments to pass to the process.
 ---@field stdio? table The stdio configuration for the process.
 ---                    Accepts either same values as vim.uv.spawn, or PIPE or STREAM.
@@ -37,8 +37,8 @@ M.STREAM = "stream"
 --- Uses `vim.uv.spawn` under the hood.
 ---
 ---@param cmd string The command to run.
----@param opts SpawnOptions
----@return Process process The process object.
+---@param opts Coop.SpawnOptions
+---@return Coop.Process process The process object.
 M.spawn = function(cmd, opts)
 	local uv = require("coop.uv")
 	local table_utils = require("coop.table-utils")

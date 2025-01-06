@@ -8,7 +8,7 @@ local unpack_packed = require("coop.table-utils").unpack_packed
 ---
 --- Futures turn spawned task functions back into task functions as they implement the call operator.
 ---
----@class Future
+---@class Coop.Future
 ---@field done boolean Whether the future is done.
 ---@field results table The results of the coroutine in pcall/coroutine.resume + pack format.
 ---@field queue table The queue of callbacks to be called once the future is done.
@@ -24,7 +24,7 @@ M.Future = {}
 
 --- Creates a new future.
 ---
----@return Future future the new future.
+---@return Coop.Future future the new future.
 M.Future.new = function()
 	local future = { done = false, queue = {} }
 	local meta_future = {
@@ -52,7 +52,7 @@ end
 
 --- Marks the future as done with an error and calls callbacks in the waiting queue.
 ---
----@param self Future the future
+---@param self Coop.Future the future
 ---@param err string the error message
 M.Future.error = function(self, err)
 	if self.done then
@@ -88,7 +88,7 @@ end
 
 --- Waits for the future to be done.
 ---
----@param self Future the future
+---@param self Coop.Future the future
 ---@return boolean success whether the future was successful and the pawait was not cancelled.
 ---@return any ... the results of the task function or an error message.
 M.Future.pawait = function(self)
@@ -102,7 +102,7 @@ end
 --- Rethrows the error if the future ended with an error or the await was cancelled.
 ---
 ---@async
----@param self Future the future
+---@param self Coop.Future the future
 ---@return any ... the results of the task function
 M.Future.await_tf = function(self)
 	local results = pack(self:pawait_tf())
@@ -117,7 +117,7 @@ end
 ---
 --- This calls the callback with the results of the coroutine function when the future is done.
 ---
----@param self Future the future
+---@param self Coop.Future the future
 ---@param cb function The callback to call with the results of the coroutine.
 M.Future.await_cb = function(self, cb)
 	if self.done then
@@ -158,7 +158,7 @@ end
 --- This is a task function that yields until the future is done.
 ---
 ---@async
----@param self Future the future
+---@param self Coop.Future the future
 ---@return boolean success whether the future was successful and the await was not cancelled.
 ---@return any ... the results of the task function or an error message.
 M.Future.pawait_tf = function(self)

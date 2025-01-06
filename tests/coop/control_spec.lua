@@ -77,7 +77,7 @@ describe("coop.control", function()
 		end)
 
 		it("protects from cancellation but still throws", function()
-			---@type Task
+			---@type Coop.Task
 			local internal_task = nil
 			local internal_task_done = false
 			local t = spawn(function()
@@ -101,7 +101,7 @@ describe("coop.control", function()
 		end)
 
 		it("completely ignores cancellation with copcall", function()
-			---@type Task
+			---@type Coop.Task
 			local internal_task = nil
 			local internal_task_done = false
 			local t = spawn(function()

@@ -140,12 +140,12 @@ A task behaves like a coroutine and comes with its own equivalent functions:
 --- Creates a task from a task function.
 ---
 ---@param task_function @async fun
----@return Task task
+---@return Coop.Task task
 task.create
 
 --- Resumes a task.
 ---
----@param task Task
+---@param task Coop.Task
 ---@param ...
 ---@return boolean success
 ---@return any ... results
@@ -162,13 +162,13 @@ task.yield
 
 --- Returns the task’s status.
 ---
----@param task Task
+---@param task Coop.Task
 ---@return string "running" | "suspended" | "normal" | "dead"
 task.status
 
 --- Returns the running task.
 ---
----@return Task?
+---@return Coop.Task?
 task.running
 ```
 
@@ -191,7 +191,7 @@ A cancel function (which is also a method):
 --- `cancel` resumes the task. It’s like sending a cancellation signal that the task needs to
 --- handle.
 ---
----@param task Task the task to cancel
+---@param task Coop.Task the task to cancel
 ---@return boolean success
 ---@return any ... results
 function task.cancel(task)
@@ -200,14 +200,14 @@ end
 
 --- Unsets the cancellation flag.
 ---
----@param task Task
+---@param task Coop.Task
 function task.unset_cancelled(task)
   -- …
 end
 
 --- Returns whether the task is cancelled.
 ---
----@param task Task
+---@param task Coop.Task
 ---@return boolean is_cancelled
 function task.is_cancelled(task)
   -- …
@@ -240,7 +240,7 @@ task:await(1000, 100) -- Wait for 1s for the task to finish. Check every 100ms
 --- Instead it returns false, err_msg.
 ---
 ---@async
----@param self Task
+---@param self Coop.Task
 ---@return boolean success
 ---@return any ... results
 function task.pawait(self)
@@ -282,7 +282,7 @@ provides utilities for combining task functions and awaitables.
 --- Cancelling the gather will cancel all tasks in the sequence.
 ---
 ---@async
----@param tasks Task[] the list of tasks.
+---@param tasks Coop.Task[] the list of tasks.
 ---@return any ... results
 M.gather = function(tasks) end
 
@@ -321,22 +321,22 @@ M.timeout = function(duration, tf, ...) end
 --- Waits for any of the given tasks to complete.
 ---
 ---@async
----@param tasks Task[]
----@return Task done The first task that completed.
----@return Task[] done The remaining tasks.
+---@param tasks Coop.Task[]
+---@return Coop.Task done The first task that completed.
+---@return Coop.Task[] done The remaining tasks.
 M.await_any = function(tasks) end
 
 --- Awaits all tasks in the list.
 ---
 ---@async
----@param tasks Task[]
+---@param tasks Coop.Task[]
 ---@return table results The results of the tasks.
 M.await_all = function(tasks) end
 
 --- Asynchronously iterates over the given awaitables and waits for each to complete.
 ---
 ---@async
----@param tasks tasks[]
+---@param tasks Coop.Task[]
 M.as_completed = function(tasks) end
 ```
 
