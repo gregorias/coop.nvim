@@ -13,7 +13,7 @@ M.sleep = function(ms)
 	local uv = require("coop.uv")
 	local copcall = require("coop.coroutine-utils").copcall
 
-	local timer = vim.uv.new_timer()
+	local timer = assert(vim.uv.new_timer())
 	local success, err = copcall(uv.timer_start, timer, ms, 0)
 	-- Safely close resources even in case of a cancellation error.
 	timer:stop()
@@ -63,7 +63,7 @@ end
 ---@param fd integer The file descriptor.
 ---@return Coop.StreamReader stream_reader The stream reader object.
 M.StreamReader.from_fd = function(fd)
-	local handle = vim.uv.new_pipe()
+	local handle = assert(vim.uv.new_pipe())
 	handle:open(fd)
 	return M.StreamReader.new(handle)
 end
@@ -145,7 +145,7 @@ end
 ---@param fd integer The file descriptor.
 ---@return Coop.StreamWriter stream_writer The stream writer object.
 M.StreamWriter.from_fd = function(fd)
-	local handle = vim.uv.new_pipe()
+	local handle = assert(vim.uv.new_pipe())
 	handle:open(fd)
 	return M.StreamWriter.new(handle)
 end
