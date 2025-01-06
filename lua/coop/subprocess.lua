@@ -14,7 +14,7 @@ M.STREAM = "stream"
 ---@field stderr uv.uv_pipe_t | StreamReader The stderr of the process.
 ---
 ---@field await async function Waits for the process to finish.
----@field kill fun(Process, signum) Kills the process. Returns 0 or fail.
+---@field kill fun(self: Process, signal: signum) Kills the process. Returns 0 or fail.
 
 ---@class SpawnOptions
 ---@field args? table The arguments to pass to the process.
@@ -37,6 +37,7 @@ M.STREAM = "stream"
 --- Uses `vim.uv.spawn` under the hood.
 ---
 ---@param cmd string The command to run.
+---@param opts SpawnOptions
 ---@return Process process The process object.
 M.spawn = function(cmd, opts)
 	local uv = require("coop.uv")
