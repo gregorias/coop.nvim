@@ -11,27 +11,27 @@ local pack = require("coop.table-utils").pack
 --- - The ability to capture errors.
 --- - The ability to cancel and handle cancellation.
 ---
----@class Task
+---@class Coop.Task
 ---@field thread thread the coroutine thread
----@field future Future the future for the coroutine
+---@field future Coop.Future the future for the coroutine
 ---
----@field status fun(Task): string returns the task’s status
----@field resume fun(Task, ...): boolean, ... resumes the task
+---@field status fun(self: Coop.Task): string returns the task’s status
+---@field resume fun(self: Coop.Task, ...): boolean, ... resumes the task
 ---
----@field cancel fun(Task): boolean, ... cancels the task
+---@field cancel fun(self: Coop.Task): boolean, ... cancels the task
 ---@field cancelled boolean true if the user has requested cancellation
----@field is_cancelled fun(Task): boolean returns true if the task is cancelled
----@field unset_cancelled fun(Task) unsets the cancelled flag
+---@field is_cancelled fun(self: Coop.Task): boolean returns true if the task is cancelled
+---@field unset_cancelled fun(self: Coop.Task) unsets the cancelled flag
 ---
 ---@field await function awaits the task
----@field pawait async fun(Task): boolean, ... awaits the task and returns errors
+---@field pawait async fun(self: Coop.Task): boolean, ... awaits the task and returns errors
 
 local running_task = nil
 
 --- Creates a new task.
 ---
 ---@param tf function the task function
----@return Task
+---@return Coop.Task
 M.create = function(tf)
 	local future_m = require("coop.future")
 	local future = future_m.Future.new()
@@ -70,7 +70,7 @@ end
 
 --- Resumes a task with the specified arguments.
 ---
----@param task Task the task to resume
+---@param task Coop.Task the task to resume
 ---@param ... ... the arguments
 ---@return boolean success
 ---@return any ... results
@@ -102,7 +102,7 @@ end
 --- `cancel` resumes the task. It’s like sending a cancellation signal that the task needs to
 --- handle.
 ---
----@param task Task the task to cancel
+---@param task Coop.Task the task to cancel
 ---@return boolean success
 ---@return any ... results
 M.cancel = function(task)
@@ -125,7 +125,7 @@ end
 
 --- Returns the currently running task or nil.
 ---
----@return Task?
+---@return Coop.Task?
 M.running = function()
 	return running_task
 end
@@ -191,7 +191,7 @@ end
 
 --- Returns the status of a task’s thread.
 ---
----@param task Task the task
+---@param task Coop.Task the task
 ---@return string "running" | "suspended" | "normal" | "dead"
 M.status = function(task)
 	return coroutine.status(task.thread)

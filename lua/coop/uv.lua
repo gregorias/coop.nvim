@@ -38,7 +38,7 @@ end
 --- Wraps a Libuv function into a task function.
 ---
 ---@param f function
----@param cb2tf_opts? CbToTfOpts
+---@param cb2tf_opts? Coop.CbToTfOpts
 ---@param cb_pos? number|string the position of the callback parameter
 ---@return async function tf
 local wrap = function(f, cb2tf_opts, cb_pos)
@@ -83,7 +83,7 @@ end
 ---@param options table
 ---@return uv.uv_process_t handle
 ---@return integer pid
----@return Future future The future for the exit code and signal.
+---@return Coop.Future future The future for the exit code and signal.
 M.spawn = function(path, options)
 	local future = coop.Future.new()
 	local handle, pid = vim.uv.spawn(path, options, function(code, signal)

@@ -6,23 +6,23 @@ local M = {}
 --- The queue uses a buffer and its push is always non-blocking.
 --- The pop operation is blocking iff the queue is empty.
 ---
----@class MpscQueue
----@field waiting Task
----@field head? MpscQueueNode
----@field tail? MpscQueueNode
----@field push fun(self: MpscQueue, value: any)
----@field pop async fun(self: MpscQueue): any
----@field empty fun(self: MpscQueue): boolean
+---@class Coop.MpscQueue
+---@field waiting Coop.Task
+---@field head? Coop.MpscQueueNode
+---@field tail? Coop.MpscQueueNode
+---@field push fun(self: Coop.MpscQueue, value: any)
+---@field pop async fun(self: Coop.MpscQueue): any
+---@field empty fun(self: Coop.MpscQueue): boolean
 
----@class MpscQueueNode
+---@class Coop.MpscQueueNode
 ---@field value any
----@field next? MpscQueueNode
+---@field next? Coop.MpscQueueNode
 
 M.MpscQueue = {}
 
 --- Creates a new multiple-producer single-consumer queue.
 ---
----@return MpscQueue
+---@return Coop.MpscQueue
 M.MpscQueue.new = function()
 	local mpsc_queue = { waiting = nil, head = nil, tail = nil }
 	return setmetatable(mpsc_queue, { __index = M.MpscQueue })
@@ -30,7 +30,7 @@ end
 
 --- Pushes a value to the queue.
 ---
----@param self MpscQueue
+---@param self Coop.MpscQueue
 ---@param value any
 M.MpscQueue.push = function(self, value)
 	if self.waiting then
@@ -53,7 +53,7 @@ end
 --- This method yields iff the queue is empty.
 ---
 ---@async
----@param self MpscQueue
+---@param self Coop.MpscQueue
 ---@return any value
 M.MpscQueue.pop = function(self)
 	if self.head == nil then
@@ -84,7 +84,7 @@ end
 
 --- Checks if the queue is empty.
 ---
----@param self MpscQueue
+---@param self Coop.MpscQueue
 ---@return boolean
 M.MpscQueue.empty = function(self)
 	return self.head == nil

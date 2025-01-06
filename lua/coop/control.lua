@@ -4,7 +4,7 @@ local M = {}
 local task = require("coop.task")
 local Future = require("coop.future").Future
 
----@alias Awaitable Future|Task
+---@alias Awaitable Coop.Future|Coop.Task
 
 --- Runs tasks in the sequence concurrently.
 ---
@@ -17,7 +17,7 @@ local Future = require("coop.future").Future
 --- Cancelling the gather will cancel all tasks in the sequence.
 ---
 ---@async
----@param tasks Task[] the list of tasks.
+---@param tasks Coop.Task[] the list of tasks.
 ---@return any ... results
 M.gather = function(tasks)
 	local task_count = #tasks

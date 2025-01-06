@@ -27,20 +27,20 @@ end
 ---
 --- This is useful for a subprocess’s stdout and stderr..
 ---
----@class StreamReader
+---@class Coop.StreamReader
 ---@field handle uv.uv_stream_t
----@field buffer MpscQueue
+---@field buffer Coop.MpscQueue
 ---@field at_eof boolean
----@field read async fun(StreamReader): string?
----@field read_until_eof async fun(StreamReader): string
----@field close async fun(StreamReader)
+---@field read async fun(self: Coop.StreamReader): string?
+---@field read_until_eof async fun(self: Coop.StreamReader): string
+---@field close async fun(self: Coop.StreamReader)
 
 M.StreamReader = {}
 
 --- Creates a stream reader.
 ---
 ---@param handle uv.uv_stream_t The handle to a readable stream.
----@return StreamReader stream_reader The stream writer object.
+---@return Coop.StreamReader stream_reader The stream writer object.
 M.StreamReader.new = function(handle)
 	if not vim.uv.is_readable(handle) then
 		error("Can not create a stream reader, because the handle is not readable.")
@@ -61,7 +61,7 @@ end
 --- Creates a stream reader from a file descriptor.
 ---
 ---@param fd integer The file descriptor.
----@return StreamReader stream_reader The stream reader object.
+---@return Coop.StreamReader stream_reader The stream reader object.
 M.StreamReader.from_fd = function(fd)
 	local handle = vim.uv.new_pipe()
 	handle:open(fd)
@@ -71,7 +71,7 @@ end
 --- Reads data from the stream.
 ---
 ---@async
----@param self StreamReader
+---@param self Coop.StreamReader
 ---@return string? data The data read from the stream or nil if the stream is at EOF.
 M.StreamReader.read = function(self)
 	if self.at_eof then
@@ -89,7 +89,7 @@ end
 --- Reads remaining data from the stream.
 ---
 ---@async
----@param self StreamReader
+---@param self Coop.StreamReader
 ---@return string data The data read from the stream.
 M.StreamReader.read_until_eof = function(self)
 	local data = {}
@@ -108,7 +108,7 @@ end
 --- Closes the stream reader.
 ---
 ---@async
----@param self StreamReader
+---@param self Coop.StreamReader
 M.StreamReader.close = function(self)
 	return require("coop.uv").close(self.handle)
 end
@@ -117,17 +117,17 @@ end
 ---
 --- This is useful for a subprocess’s stdin.
 ---
----@class StreamWriter
+---@class Coop.StreamWriter
 ---@field handle uv.uv_stream_t
----@field write async fun(StreamWriter, string)
----@field close async fun(StreamWriter)
+---@field write async fun(self: Coop.StreamWriter, data: string)
+---@field close async fun(self: Coop.StreamWriter)
 
 M.StreamWriter = {}
 
 --- Creates a stream writer.
 ---
 ---@param handle uv.uv_stream_t The handle to a writable stream.
----@return StreamWriter stream_writer The stream writer object.
+---@return Coop.StreamWriter stream_writer The stream writer object.
 M.StreamWriter.new = function(handle)
 	if not vim.uv.is_writable(handle) then
 		error("Can not create a stream writer, because the handle is not writable.")
@@ -143,7 +143,7 @@ end
 --- Creates a stream writer from a file descriptor.
 ---
 ---@param fd integer The file descriptor.
----@return StreamWriter stream_writer The stream writer object.
+---@return Coop.StreamWriter stream_writer The stream writer object.
 M.StreamWriter.from_fd = function(fd)
 	local handle = vim.uv.new_pipe()
 	handle:open(fd)
@@ -153,7 +153,7 @@ end
 --- Writes data to the stream.
 ---
 ---@async
----@param self StreamWriter
+---@param self Coop.StreamWriter
 ---@param data string The data to write.
 ---@return string? err
 ---@return string? err_name
@@ -164,7 +164,7 @@ end
 --- Closes the stream writer.
 ---
 ---@async
----@param self StreamWriter
+---@param self Coop.StreamWriter
 M.StreamWriter.close = function(self)
 	return require("coop.uv").close(self.handle)
 end
