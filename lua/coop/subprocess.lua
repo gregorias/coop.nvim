@@ -9,9 +9,9 @@ M.STREAM = "stream"
 ---@class Process
 ---@field handle uv.uv_process_t The handle to the process.
 ---@field pid integer The process ID.
----@field stdin any The stdin of the process.
----@field stdout any The stdout of the process.
----@field stderr any The stderr of the process.
+---@field stdin uv.uv_pipe_t | StreamWriter The stdin of the process.
+---@field stdout uv.uv_pipe_t | StreamReader The stdout of the process.
+---@field stderr uv.uv_pipe_t | StreamReader The stderr of the process.
 ---
 ---@field await async function Waits for the process to finish.
 ---@field kill fun(Process, signum) Kills the process. Returns 0 or fail.
