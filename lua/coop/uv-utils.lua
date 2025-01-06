@@ -28,7 +28,7 @@ end
 --- This is useful for a subprocess’s stdout and stderr..
 ---
 ---@class StreamReader
----@field handle uv_stream_t
+---@field handle uv.uv_stream_t
 ---@field buffer MpscQueue
 ---@field at_eof boolean
 ---@field read async fun(StreamReader): string?
@@ -39,7 +39,7 @@ M.StreamReader = {}
 
 --- Creates a stream reader.
 ---
----@param handle uv_stream_t The handle to a readable stream.
+---@param handle uv.uv_stream_t The handle to a readable stream.
 ---@return StreamReader stream_reader The stream writer object.
 M.StreamReader.new = function(handle)
 	if not vim.uv.is_readable(handle) then
@@ -118,7 +118,7 @@ end
 --- This is useful for a subprocess’s stdin.
 ---
 ---@class StreamWriter
----@field handle uv_stream_t
+---@field handle uv.uv_stream_t
 ---@field write async fun(StreamWriter, string)
 ---@field close async fun(StreamWriter)
 
@@ -126,7 +126,7 @@ M.StreamWriter = {}
 
 --- Creates a stream writer.
 ---
----@param handle uv_stream_t The handle to a writable stream.
+---@param handle uv.uv_stream_t The handle to a writable stream.
 ---@return StreamWriter stream_writer The stream writer object.
 M.StreamWriter.new = function(handle)
 	if not vim.uv.is_writable(handle) then
