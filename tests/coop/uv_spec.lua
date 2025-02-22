@@ -14,6 +14,7 @@ describe("coop.uv", function()
 			local stdin = vim.uv.new_pipe()
 			local stdout = vim.uv.new_pipe()
 			local stderr = vim.uv.new_pipe()
+			assert(stdin ~= nil and stdout ~= nil and stderr ~= nil)
 
 			local handle, pid, cat_future = uv.spawn("cat", {
 				stdio = { stdin, stdout, stderr },
@@ -46,6 +47,7 @@ describe("coop.uv", function()
 	describe("shutdown", function()
 		it("returns a fail on a non-writable pipe", function()
 			local p = vim.uv.new_pipe()
+			assert(p ~= nil)
 
 			local err, name = coop.spawn(function()
 				return uv.shutdown(p)
@@ -57,6 +59,7 @@ describe("coop.uv", function()
 
 		it("shuts down a pipe", function()
 			local stdin = vim.uv.new_pipe()
+			assert(stdin ~= nil)
 			local handle, _, _ = uv.spawn("cat", {
 				stdio = { stdin },
 			})
@@ -79,6 +82,7 @@ describe("coop.uv", function()
 	describe("write", function()
 		it("returns a fail on a non-writable pipe", function()
 			local p = vim.uv.new_pipe()
+			assert(p ~= nil)
 
 			local err = coop.spawn(function()
 				return uv.write(p, "foo")
@@ -89,9 +93,12 @@ describe("coop.uv", function()
 
 		it("cancellation works", function()
 			local fds = vim.uv.pipe({ nonblock = true }, { nonblock = true })
+			assert(fds ~= nil)
 			local read_pipe = vim.uv.new_pipe()
+			assert(read_pipe ~= nil)
 			read_pipe:open(fds.read)
 			local write_pipe = vim.uv.new_pipe()
+			assert(write_pipe ~= nil)
 			write_pipe:open(fds.write)
 
 			coop.spawn(function()
@@ -106,9 +113,12 @@ describe("coop.uv", function()
 
 		it("writes to a pipe", function()
 			local fds = vim.uv.pipe({ nonblock = true }, { nonblock = true })
+			assert(fds ~= nil)
 			local read_pipe = vim.uv.new_pipe()
+			assert(read_pipe ~= nil)
 			read_pipe:open(fds.read)
 			local write_pipe = vim.uv.new_pipe()
+			assert(write_pipe ~= nil)
 			write_pipe:open(fds.write)
 
 			local read_future = coop.Future.new()
