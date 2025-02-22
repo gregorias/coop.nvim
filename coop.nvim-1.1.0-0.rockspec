@@ -1,6 +1,6 @@
 rockspec_format = "3.0"
 package = "coop.nvim"
-version = "1.0.1-0"
+version = "1.1.0-0"
 
 source = {
 	url = "git+https://github.com/gregorias/coop.nvim",
@@ -31,6 +31,7 @@ build = {
 		["coop.table-utils"] = "lua/coop/table-utils.lua",
 		["coop.task"] = "lua/coop/task.lua",
 		["coop.task-utils"] = "lua/coop/task-utils.lua",
+		["coop.ui"] = "lua/coop/ui.lua",
 		["coop.uv"] = "lua/coop/uv.lua",
 		["coop.uv-utils"] = "lua/coop/uv-utils.lua",
 		["coop.vim"] = "lua/coop/vim.lua",
