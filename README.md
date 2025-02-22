@@ -417,6 +417,12 @@ coop.spawn(pass_printf_to_cat)
 
 </details>
 
+### `coop.ui`
+
+[The `ui` module](https://github.com/gregorias/coop.nvim/blob/main/lua/coop/ui.lua)
+provides task function versions of functions in
+[`vim.ui`][Neovim UI] (`input` and `select`).
+
 ### `coop.uv`
 
 [The `uv` module](https://github.com/gregorias/coop.nvim/blob/main/lua/coop/uv.lua)
@@ -531,5 +537,6 @@ The SVG from the logo comes from
 
 [Lazy]: https://github.com/folke/lazy.nvim
 [Nio]: https://github.com/nvim-neotest/nvim-nio
+[Neovim UI]: https://neovim.io/doc/user/lua.html#vim.ui
 [Neovim UV]: https://neovim.io/doc/user/luvref.html
 [Rocks]: https://github.com/nvim-neorocks/rocks.nvim
