@@ -9,9 +9,11 @@ local M = {}
 ---@return vim.SystemCompleted out
 M.system = function(cmd, opts)
 	local cb_to_tf = require("coop.task-utils").cb_to_tf
-	local shift_parameters = require("coop.functional-utils").shift_parameters
 
-	return cb_to_tf(shift_parameters(vim.system))(cmd, opts)
+	-- `schedule_wrap` is necessary: https://github.com/gregorias/coop.nvim/issues/10.
+	return cb_to_tf(function(cb)
+		vim.system(cmd, opts, vim.schedule_wrap(cb))
+	end)()
 end
 
 return M
