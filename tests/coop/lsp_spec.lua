@@ -18,7 +18,9 @@ describe("coop.lsp", function()
 					return fake_server(dispatchers)
 				end,
 			})
+			assert(client_id ~= nil)
 			local lsp_client = vim.lsp.get_client_by_id(client_id)
+			assert(lsp_client ~= nil)
 
 			local t = coop.spawn(function()
 				return coop_lsp.request(lsp_client, "textDocument/definition", nil)
@@ -37,7 +39,9 @@ describe("coop.lsp", function()
 					return fake_server(dispatchers)
 				end,
 			})
+			assert(client_id ~= nil)
 			local lsp_client = vim.lsp.get_client_by_id(client_id)
+			assert(lsp_client ~= nil)
 
 			local t = coop.spawn(function()
 				return coop_lsp.request(lsp_client, "does_not_exist", nil)
@@ -63,7 +67,9 @@ describe("coop.lsp", function()
 					return fake_server(dispatchers)
 				end,
 			})
+			assert(client_id ~= nil)
 			local lsp_client = vim.lsp.get_client_by_id(client_id)
+			assert(lsp_client ~= nil)
 
 			local t = coop.spawn(function()
 				return coop_lsp.request(lsp_client, "textDocument/definition", nil)
