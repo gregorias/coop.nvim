@@ -86,9 +86,13 @@ end
 ---@return Coop.Future future The future for the exit code and signal.
 M.spawn = function(path, options)
 	local future = coop.Future.new()
-	local handle, pid = vim.uv.spawn(path, options, function(code, signal)
-		future:complete(code, signal)
-	end)
+	local handle, pid = vim.uv.spawn(
+		path,
+		options,
+		vim.schedule_wrap(function(code, signal)
+			future:complete(code, signal)
+		end)
+	)
 	return handle, pid, future
 end
 

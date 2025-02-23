@@ -71,4 +71,17 @@ describe("coop.subprocess", function()
 
 		assert.are.same("done", result)
 	end)
+
+	it("executes continuation outside of Lua loop", function()
+		local results = coop.spawn(function()
+			local ls = subprocess.spawn("ls", {
+				args = { "selene.toml" },
+				stdio = { nil, subprocess.STREAM },
+			})
+			ls:await()
+			-- nvim_buf_is_loaded can not be called from the Lua loop.
+			return vim.api.nvim_buf_is_loaded(0)
+		end):await(100, 1)
+		assert.are.same(true, results)
+	end)
 end)
