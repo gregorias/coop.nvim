@@ -10,7 +10,6 @@ local M = {}
 M.system = function(cmd, opts)
 	local cb_to_tf = require("coop.task-utils").cb_to_tf
 
-	-- `schedule_wrap` is necessary: https://github.com/gregorias/coop.nvim/issues/10.
 	return cb_to_tf(function(cb)
 		vim.system(cmd, opts, vim.schedule_wrap(cb))
 	end)()
