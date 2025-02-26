@@ -491,7 +491,7 @@ end
 
 No.
 
-You can not use coroutine functions in task functions, because when coroutine
+You can not use coroutine functions in task functions, because the coroutine
 yield doesn’t handle cancellation.
 
 You can not use task functions in coroutines, because `task.yield` requires
