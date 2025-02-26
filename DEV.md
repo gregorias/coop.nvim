@@ -124,6 +124,14 @@ This makes the cancellation interface more flexible:
    without the `cancelled` flag, it’s unclear whether it comes from `task` or
    the running task.
 
+### `schedule_wrap`
+
+I use `schedule_wrap` on callbacks that otherwise would work in
+[a restricted context, e.g., a fast event context](https://neovim.io/doc/user/lua.html#lua-loop-callbacks).
+The reason for this is to let programmers not have to think about this and make
+Coop wrappers universal.
+I don’t think the performance cost of `vim.schedule` matters.
+
 [Commitlint]: https://github.com/conventional-changelog/commitlint
 [Lefthook]: https://github.com/evilmartians/lefthook
 [Just]: https://just.systems/
