@@ -1,6 +1,6 @@
 rockspec_format = "3.0"
 package = "coop.nvim"
-version = "1.1.0-0"
+version = "1.1.1-0"
 
 source = {
 	url = "git+https://github.com/gregorias/coop.nvim",
