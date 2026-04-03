@@ -13,7 +13,7 @@ describe("coop.lsp", function()
 			end)
 
 			local client_id = vim.lsp.start({
-				name = "fake LSP",
+				name = "fake LSP forwards a request",
 				cmd = function(dispatchers)
 					return fake_server(dispatchers)
 				end,
@@ -34,7 +34,7 @@ describe("coop.lsp", function()
 			local fake_server = FakeLspServer({})
 
 			local client_id = vim.lsp.start({
-				name = "fake LSP",
+				name = "fake LSP returns an error on failed request",
 				cmd = function(dispatchers)
 					return fake_server(dispatchers)
 				end,
@@ -62,7 +62,7 @@ describe("coop.lsp", function()
 			end)
 
 			local client_id = vim.lsp.start({
-				name = "fake LSP",
+				name = "fake LSP cancels ongoing requests",
 				cmd = function(dispatchers)
 					return fake_server(dispatchers)
 				end,

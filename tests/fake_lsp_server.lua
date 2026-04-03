@@ -35,15 +35,19 @@ function M.server(dispatchers)
 	---@return boolean success
 	---@return number? request_id
 	function srv.request(method, params, callback)
-		if method == "initialize" then
-			callback(nil, { capabilities = {} })
-		elseif method == "shutdown" then
-			callback(nil, nil)
-		elseif request_handlers[method] ~= nil then
-			request_handlers[method](params, callback)
-		else
+		if method ~= "initialize" and method ~= "shutdown" and request_handlers[method] == nil then
 			return false, nil
 		end
+
+		vim.schedule(function()
+			if method == "initialize" then
+				callback(nil, { capabilities = {} })
+			elseif method == "shutdown" then
+				callback(nil, nil)
+			elseif request_handlers[method] ~= nil then
+				request_handlers[method](params, callback)
+			end
+		end)
 		request_id = request_id + 1
 		return true, request_id
 	end
