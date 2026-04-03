@@ -15,7 +15,7 @@ local M = {}
 ---@return lsp.HandlerContext? ctx The context of the request.
 function M.request(client, method, params, bufnr)
 	local request_cb = function(cb)
-		local success, request_id = client.request(method, params, function(...)
+		local success, request_id = client:request(method, params, function(...)
 			cb(...)
 		end, bufnr)
 		if not success then
@@ -31,7 +31,7 @@ function M.request(client, method, params, bufnr)
 			local unpack_packed = require("coop.table-utils").unpack_packed
 			local success, request_id = unpack_packed(rvals)
 			if success and request_id then
-				client.cancel_request(request_id)
+				client:cancel_request(request_id)
 			end
 		end,
 	})()
