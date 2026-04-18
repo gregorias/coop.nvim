@@ -95,7 +95,7 @@ M.shield = function(tf, ...)
 	local cancelled = false
 	local cancel_msg = ""
 	local t = spawn(tf, ...)
-	local results = pack()
+	local results
 	while true do
 		results = pack(t:pawait())
 

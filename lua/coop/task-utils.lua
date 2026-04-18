@@ -16,8 +16,8 @@ local task = require("coop.task")
 
 local normalize_cp_to_tf_opts = function(opts)
 	opts = opts or {}
-	opts.on_cancel = opts.on_cancel or function(...) end
-	opts.cleanup = opts.cleanup or function(...) end
+	opts.on_cancel = opts.on_cancel or function() end
+	opts.cleanup = opts.cleanup or function() end
 	return opts
 end
 
