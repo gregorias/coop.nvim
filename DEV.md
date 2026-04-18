@@ -9,12 +9,13 @@ This project requires the following tools:
 - [Commitlint]
 - [Just]
 - [Lefthook]
+- [LuaRocks]
 - [Stylua]
 
-Install lefthook:
+Run the initialization script:
 
 ```shell
-lefthook install
+just init
 ```
 
 ## Ops
@@ -134,5 +135,6 @@ I don’t think the performance cost of `vim.schedule` matters.
 
 [Commitlint]: https://github.com/conventional-changelog/commitlint
 [Lefthook]: https://github.com/evilmartians/lefthook
+[LuaRocks]: https://luarocks.org/
 [Just]: https://just.systems/
 [Stylua]: https://github.com/JohnnyMorganz/StyLua

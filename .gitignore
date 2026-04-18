@@ -1,11 +1,12 @@
 .tests
 
+# LuaRocks
+/lua_modules
+/.luarocks
+*.src.rock
+
 # LuaCov
 luacov.stats.out
 luacov-html
 luacov.report.html
 luacov.report.out
-
-# LuaRocks
-
-*.src.rock
