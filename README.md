@@ -539,4 +539,4 @@ The SVG from the logo comes from
 [Nio]: https://github.com/nvim-neotest/nvim-nio
 [Neovim UI]: https://neovim.io/doc/user/lua.html#vim.ui
 [Neovim UV]: https://neovim.io/doc/user/luvref.html
-[Rocks]: https://github.com/nvim-neorocks/rocks.nvim
+[Rocks]: https://github.com/lumen-oss/rocks.nvim

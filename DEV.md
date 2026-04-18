@@ -10,6 +10,7 @@ This project requires the following tools:
 - [Just]
 - [Lefthook]
 - [LuaRocks]
+- [Lychee]
 - [Stylua]
 
 Run the initialization script:
@@ -136,5 +137,6 @@ I don’t think the performance cost of `vim.schedule` matters.
 [Commitlint]: https://github.com/conventional-changelog/commitlint
 [Lefthook]: https://github.com/evilmartians/lefthook
 [LuaRocks]: https://luarocks.org/
+[Lychee]: https://github.com/lycheeverse/lychee
 [Just]: https://just.systems/
 [Stylua]: https://github.com/JohnnyMorganz/StyLua
