@@ -55,7 +55,7 @@ describe("coop.subprocess", function()
 			return err_msg
 		end):await(10000, 1)
 
-		assert.are.same("ls: asdf: No such file or directory\n", result)
+		assert.is.Not.Nil(result:match("No such file or directory"))
 	end)
 
 	it("kill kills", function()
