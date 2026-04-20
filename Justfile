@@ -29,3 +29,9 @@ luacheck:
 
 test:
   @busted
+
+bump:
+  ./scripts/bump
+
+push-current-version:
+  ./scripts/push-current-version

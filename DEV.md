@@ -21,6 +21,15 @@ just init
 
 ## Ops
 
+### GitHub release
+
+1. Cut off a version in `CHANGELOG.md` by moving the content of “Unreleased” to
+   “TBR — \<date\>”.
+1. Bump the version with a commit & tag:
+   `just bump`.
+1. Release the version commit & tag:
+   `just push-current-version`.
+
 ### LuaRocks release
 
 To release a new version to LuaRocks, do the following:
