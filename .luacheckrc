@@ -20,6 +20,7 @@ read_globals = {
 }
 
 exclude_files = {
+	".jj",
 	".luarocks",
 	".tests",
 	"lua_modules",
